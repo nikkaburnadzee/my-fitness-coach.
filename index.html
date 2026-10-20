@@ -1588,28 +1588,44 @@
             try { return JSON.parse(localStorage.getItem(profileCacheKey(uid)) || 'null'); }
             catch (e) { return null; }
         }
+        function isCompleteProfile(profile) {
+            if (!profile) return false;
+            if (profile.setupComplete === true) return true;
+            // Older app versions sometimes saved all onboarding fields but not the completion flag.
+            // Never treat an email-only registration document as a completed profile.
+            var name = String(profile.name || '').trim();
+            var validName = name && name !== 'მომხმარებელი' && name !== 'კლიენტი'
+                && name !== String(profile.email || '').split('@')[0];
+            return Boolean(validName && profile.username && profile.goalCal > 0 &&
+                profile.goalProt > 0 && profile.targetWeight > 0);
+        }
         function loadSavedProfile(uid) {
             var cached = readCachedProfile(uid);
-            if (cached && cached.setupComplete === true) userDocData = Object.assign({}, userDocData, cached);
+            var cachedComplete = isCompleteProfile(cached);
+            if (cachedComplete) {
+                userDocData = Object.assign({}, userDocData, cached, {setupComplete:true});
+            }
             return db.collection('users').doc(uid).get().then(function(doc) {
-                if (doc.exists) {
-                    var cloud = doc.data() || {};
-                    if (cloud.setupComplete === true) {
-                        userDocData = Object.assign({}, userDocData, cloud);
-                        cacheProfile(uid, userDocData);
-                    } else if (cached && cached.setupComplete === true) {
-                        // Recover completed setup if an older client reset the cloud flag.
-                        return db.collection('users').doc(uid).set(cached, { merge: true }).then(function() {
-                            userDocData = Object.assign({}, userDocData, cached);
-                        });
-                    } else {
-                        userDocData = Object.assign({}, userDocData, cloud);
+                var cloud = doc.exists ? (doc.data() || {}) : {};
+                if (isCompleteProfile(cloud)) {
+                    userDocData = Object.assign({}, userDocData, cloud, {setupComplete:true});
+                    cacheProfile(uid, userDocData);
+                    if (cloud.setupComplete !== true) {
+                        return db.collection('users').doc(uid).set({setupComplete:true},{merge:true})
+                            .catch(function(e){ console.warn('Profile migration failed',e); });
                     }
+                } else if (cachedComplete) {
+                    // Do not overwrite existing cloud fields with stale cache.
+                    userDocData = Object.assign({}, userDocData, cloud, cached, {setupComplete:true});
+                    return db.collection('users').doc(uid).set(userDocData, {merge:true})
+                        .catch(function(e){ console.warn('Profile sync failed',e); });
+                } else {
+                    userDocData = Object.assign({}, userDocData, cloud);
                 }
             }).catch(function(err) {
-                if (!(cached && cached.setupComplete === true)) throw err;
-                console.warn('Using locally saved profile; cloud sync unavailable', err);
-                showNotification('პროფილი ჩაიტვირთა მოწყობილობიდან; ღრუბელთან კავშირი შესამოწმებელია.', true);
+                if (!cachedComplete) throw err;
+                console.warn('Offline profile cache used', err);
+                userDocData = Object.assign({}, userDocData, cached, {setupComplete:true});
             });
         }
 
@@ -1742,10 +1758,10 @@
                 var u = auth.currentUser;
                 document.getElementById('verify-screen').classList.remove('active');
                 return db.collection('users').doc(u.uid).get().then(function(doc) {
-                    if (doc.exists) userDocData = Object.assign(userDocData, doc.data());
-                    if (userDocData.setupComplete) cacheProfile(u.uid, userDocData);
-                    if (!userDocData.setupComplete) document.getElementById('onboarding-screen').classList.add('active');
-                    else initApp();
+                    return loadSavedProfile(u.uid).then(function() {
+                        if (userDocData.setupComplete) initApp();
+                        else document.getElementById('onboarding-screen').classList.add('active');
+                    });
                 });
             }).catch(function(e) { setTxt('verify-status', 'შეცდომა: ' + e.message); });
         }
@@ -1761,7 +1777,11 @@
 
         function logoutUser() { if (auth) auth.signOut(); closeSettings(); }
 
+        var onboardingSaving = false;
         function finishOnboarding() {
+            if (onboardingSaving) return;
+            if (!currentUser || !db) return showNotification('ჯერ შედით ანგარიშში.', true);
+            onboardingSaving = true;
             var n = escapeHTML(document.getElementById('ob-name').value) || "კლიენტი";
             var uname = escapeHTML(document.getElementById('ob-username').value.trim().toLowerCase()) || ("user_" + Math.floor(Math.random() * 1000));
             var a = parseInt(document.getElementById('ob-age').value, 10) || 25;
@@ -1800,10 +1820,11 @@
 
             db.collection('users').doc(currentUser.uid).set(userDocData, { merge: true }).then(function() {
                 cacheProfile(currentUser.uid, userDocData);
+                onboardingSaving = false;
                 document.getElementById('onboarding-screen').classList.remove('active');
                 triggerConfetti();
                 initApp();
-            }).catch(function(e){ showNotification('პროფილის შენახვა ვერ მოხერხდა: ' + e.message, true); });
+            }).catch(function(e){ onboardingSaving = false; showNotification('პროფილის შენახვა ვერ მოხერხდა: ' + e.message, true); });
         }
 
         function initApp() {
