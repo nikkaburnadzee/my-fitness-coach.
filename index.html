@@ -182,7 +182,33 @@
         .quote-box {background:rgba(57,223,173,.07);border-left-color:var(--primary);color:#b6e6d6;}
         @media (max-width:365px) {.nav-btn{font-size:8px}.nav-btn svg{width:19px;height:19px}.bottom-nav{left:5px;right:5px}}
         @media (prefers-reduced-motion:reduce) {*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-    </style>
+    
+        /* Mobile layout fixes: workout controls, search, and AI conversation */
+        *, *::before, *::after { box-sizing:border-box; }
+        .workout-splits { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:14px; }
+        .workout-splits .split-pill { width:100%; min-width:0; white-space:normal; line-height:1.35; min-height:46px; padding:10px 6px; font-size:11px; }
+        .rest-actions { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; }
+        .rest-actions button { width:100%; min-width:0; padding:10px 2px; font-size:11px; }
+        #tab-workout .card > div:first-child { gap:10px; flex-wrap:wrap; }
+        #tab-workout .card > div:first-child h2 { min-width:0; flex:1 1 170px; }
+        #workout-difficulty-select { flex:0 0 auto; max-width:145px; }
+        .workout-exercises { list-style:none; padding:0; margin:0; display:grid; gap:8px; }
+        .workout-exercises li { display:flex; justify-content:space-between; gap:12px; padding:9px 11px; background:rgba(255,255,255,.035); border:1px solid var(--glass-border); border-radius:12px; }
+        .workout-exercises strong { color:var(--primary); white-space:nowrap; }
+        #ai-modal { padding:12px; }
+        #ai-modal .modal-content { width:min(100%,540px); max-height:min(88dvh,760px); padding:16px; overflow:hidden; display:flex; flex-direction:column; }
+        #ai-modal .modal-content h2 { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0; }
+        #ai-chat-box { height:auto!important; min-height:180px; flex:1 1 340px; max-height:48dvh; overflow-y:auto; overscroll-behavior:contain; padding:12px!important; }
+        #ai-chat-box .msg-bubble { flex:0 0 auto; max-width:92%; font-size:14px; line-height:1.55; overflow-wrap:anywhere; white-space:pre-wrap; }
+        .ai-compose { display:flex; gap:8px; align-items:stretch; min-width:0; flex-shrink:0; }
+        .ai-compose input { flex:1 1 0; min-width:0; font-size:16px; }
+        .ai-compose button { flex:0 0 auto; width:auto; padding:10px 13px; }
+        .ai-hint { font-size:11px; color:var(--text-muted); line-height:1.5; margin:4px 0 10px; }
+        #food-search-results { max-height:260px!important; }
+        #food-search-results > div { min-width:0; gap:8px; }
+        #food-search-results b { overflow-wrap:anywhere; }
+        @media(max-width:380px) { .rest-actions { grid-template-columns:repeat(3,minmax(0,1fr)); } .workout-splits .split-pill { font-size:10px; } }
+</style>
 </head>
 <body>
 
@@ -432,7 +458,7 @@
 
                 <!-- Food Search & Log -->
                 <div class="card">
-                    <h2>საკვების ბაზა & ძებნა (70+ პროდუქტი)</h2>
+                    <h2>საკვების ბაზა & ძებნა</h2>
                     <input type="text" id="food-search" placeholder="მოძებნე (მაგ: ხინკალი, ქათამი, წიწიბურა)..." oninput="searchFood()">
                     <div id="food-search-results" style="max-height: 140px; overflow-y: auto; margin-bottom: 6px;"></div>
                 </div>
@@ -489,7 +515,7 @@
                             <option value="advanced">Advanced</option>
                         </select>
                     </div>
-                    <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:10px;">
+                    <div class="workout-splits">
                         <button class="split-pill active" onclick="selectWorkoutSplit('legs', this)"> ფეხები/მუცელი</button>
                         <button class="split-pill" onclick="selectWorkoutSplit('push', this)"> Push (მკერდი/ტრიც.)</button>
                         <button class="split-pill" onclick="selectWorkoutSplit('pull', this)"> Pull (ზურგი/ბიც.)</button>
@@ -502,7 +528,7 @@
                             <span style="font-size:11px; font-weight:700; color:var(--warning);"> სეტებს შორის დასვენების ტაიმერი:</span>
                             <span id="rest-timer-countdown" style="font-weight:800; color:var(--warning); font-size:13px;"></span>
                         </div>
-                        <div class="flex-row">
+                        <div class="rest-actions">
                             <button class="secondary sm" onclick="startRestTimer(45)">45 წმ</button>
                             <button class="secondary sm" onclick="startRestTimer(60)">60 წმ</button>
                             <button class="secondary sm" onclick="startRestTimer(90)">90 წმ</button>
@@ -716,12 +742,13 @@
     <div class="modal" id="ai-modal">
         <div class="modal-content">
             <h2 style="color:var(--accent);"> AI ქოუჩი & მეგობარი <span style="cursor:pointer;" onclick="toggleAiModal()">✕</span></h2>
-            <div class="chat-container" id="ai-chat-box" style="height:260px; background:var(--surface); padding:10px; border-radius:14px;">
-                <div class="msg-bubble coach">გაუმარჯოს! მე შენი პირადი AI ქოუჩი და მეგობარი ვარ. მკითხე აბსოლუტურად ყველაფერი — კალორიები, ვარჯიში, დიეტა, თუ უბრალოდ მოტივაცია გჭირდება! </div>
+            <p class="ai-hint">AI-ს სრული შესაძლებლობებისთვის საჭიროა უსაფრთხო სერვერული API. გასაღები HTML-ში არ ჩაწეროთ.</p>
+            <div class="chat-container" id="ai-chat-box">
+                <div class="msg-bubble coach">გამარჯობა! შემიძლია შენი პროგრესის შესახებ არსებული მონაცემების შეჯამება. თავისუფალი AI საუბარი ხელმისაწვდომი იქნება სერვერული კავშირის დამატების შემდეგ.</div>
             </div>
-            <div class="flex-row">
+            <div class="ai-compose">
                 <input type="text" id="ai-input" placeholder="მკითხე ყველაფერი..." style="margin:0;" onkeypress="if(event.key==='Enter') askAi()">
-                <button class="accent sm" onclick="askAi()">></button>
+                <button class="accent sm" id="ai-send" aria-label="შეტყობინების გაგზავნა" onclick="askAi()">გაგზავნა</button>
             </div>
         </div>
     </div>
@@ -1149,19 +1176,38 @@
             setTxt('rest-timer-countdown', '');
         }
 
+        var activeWorkoutSplit = 'legs';
+        var workoutDifficulty = localStorage.getItem('workoutDifficulty') || 'beginner';
+        function changeWorkoutDifficulty(value) {
+            if (['beginner','intermediate','advanced'].indexOf(value) === -1) return;
+            workoutDifficulty = value;
+            localStorage.setItem('workoutDifficulty', value);
+            selectWorkoutSplit(activeWorkoutSplit, document.querySelector('.split-pill.active'));
+        }
+        function syncWorkoutDifficulty() {
+            var sel = document.getElementById('workout-difficulty-select');
+            if (sel) sel.value = workoutDifficulty;
+        }
         function selectWorkoutSplit(splitKey, btn) {
-            triggerHaptic();
+            activeWorkoutSplit = splitKey;
             var pills = document.querySelectorAll('.split-pill');
             for (var i = 0; i < pills.length; i++) pills[i].classList.remove('active');
+            var keys = ['legs','push','pull','hiit'];
+            var index = keys.indexOf(splitKey);
             if (btn) btn.classList.add('active');
-
+            else if (index >= 0 && pills[index]) pills[index].classList.add('active');
             var splits = {
-                legs: "1. ჩაჯდომები (4x10)\n2. რუმინული წევა (3x12)\n3. ლანჯები (3x10)\n4. პლანკა (3x45 წმ)",
-                push: "1. ჟიმი წოლში (4x10)\n2. დახრილი განტელები (3x12)\n3. აზიდვები ორძელზე (3x12)\n4. ფრანგული ჟიმი (3x12)",
-                pull: "1. აზიდვა ღერძზე (4x8)\n2. შტანგის მიზიდვა (4x10)\n3. ბლოკის ჩამოწევა (3x12)\n4. ჰამერები (3x12)",
-                hiit: "1. ბარპი (4x12)\n2. მთამსვლელი (4x40 წმ)\n3. ნახტომებით ჩაჯდომა (4x15)\n4. სწრაფი სიარული (15 წთ)"
+                legs: [['ჩაჯდომები','რუმინული წევა','ლანჯები','პლანკა'],['3×8','2×10','2×8','3×20 წმ'],['4×10','3×12','3×10','3×45 წმ'],['5×8','4×10','4×12','4×60 წმ']],
+                push: [['აზიდვები','დახრილი აზიდვები','მხრების პრესი','ტრიცეფსის გაშლა'],['3×6','2×8','2×10','2×10'],['4×10','3×12','3×12','3×12'],['5×12','4×12','4×10','4×12']],
+                pull: [['ზურგის მიზიდვა','ჰორიზონტალური წევა','ბიცეფსის მოხრა','უკანა მხრის გაშლა'],['3×10','2×10','2×10','2×12'],['4×10','3×12','3×12','3×12'],['5×10','4×12','4×12','4×15']],
+                hiit: [['სწრაფი სიარული','მთამსვლელი','ჩაჯდომები','ადგილზე სირბილი'],['10 წთ','3×20 წმ','2×10','3×30 წმ'],['15 წთ','4×30 წმ','3×12','4×40 წმ'],['20 წთ','5×40 წმ','4×15','5×45 წმ']]
             };
-            setHtml('split-workout-details', (splits[splitKey] || '').replace(/\n/g, '<br>'));
+            var d = workoutDifficulty === 'advanced' ? 3 : (workoutDifficulty === 'intermediate' ? 2 : 1);
+            var rows = splits[splitKey] || splits.legs;
+            var html = '<ol class="workout-exercises">';
+            for (var j=0;j<rows[0].length;j++) html += '<li><span>' + rows[0][j] + '</span><strong>' + rows[d][j] + '</strong></li>';
+            html += '</ol>';
+            setHtml('split-workout-details', html);
         }
 
         function addWorkoutLog() {
@@ -1750,6 +1796,7 @@
             renderHabitHeatmap();
             renderLeaderboard();
             generateReferralCode();
+            syncWorkoutDifficulty();
             selectWorkoutSplit('legs', null);
 
             var admNav = document.getElementById('admin-nav-btn');
@@ -1795,28 +1842,68 @@
             window.scrollTo(0, 0);
         }
 
-        // AI ASSISTANT (HUMAN SMART BOT)
+        // AI ASSISTANT (requires a protected server endpoint for open-ended AI)
         function toggleAiModal() { document.getElementById('ai-modal').classList.toggle('active'); }
-        function askAi() {
-            var inp = document.getElementById('ai-input');
-            var v = inp ? inp.value.trim().toLowerCase() : '';
-            if (!v) return;
+        var aiConversation = [];
+        var aiBusy = false;
+        function appendAiMessage(text, who) {
             var box = document.getElementById('ai-chat-box');
-            box.innerHTML += '<div class="msg-bubble me">' + escapeHTML(v) + '</div>';
+            if (!box) return;
+            var bubble = document.createElement('div');
+            bubble.className = 'msg-bubble ' + (who === 'me' ? 'me' : 'coach');
+            bubble.textContent = text;
+            box.appendChild(bubble);
+            box.scrollTop = box.scrollHeight;
+            return bubble;
+        }
+        async function askAi() {
+            var inp = document.getElementById('ai-input');
+            var question = inp ? inp.value.trim() : '';
+            if (!question || aiBusy) return;
+            if (question.length > 2000) return showNotification('შეკითხვა ძალიან გრძელია.', true);
+            appendAiMessage(question, 'me');
             inp.value = '';
-
-            setTimeout(function() {
-                var reply = "შესანიშნავი კითხვაა! როგორც შენი მეგობარი გირჩევ: დღის მთავარი ამოცანაა კალორიული ბალანსი, 2.5ლ წყალი და 7,000+ ნაბიჯი. თუ კონკრეტულ საკვებზე გაინტერესებს, მომწერე მისი სახელი!";
-                if (v.indexOf("რა არ უნდა") !== -1 || v.indexOf("მავნე") !== -1) {
-                    reply = "🚫 მოერიდე რაფინირებულ შაქარს, გაზიან ტკბილ სასმელებს, ტრანს-ცხიმებსა და თეთრ ცომეულს. ესენი ინსულინს მაღლა სწევს და ცხიმის წვას ბლოკავს!";
-                } else if (v.indexOf("რა ვჭამო") !== -1 || v.indexOf("მენიუ") !== -1) {
-                    reply = "🥗 აი ჩემი ოქროს მენიუ: საუზმეზე 2-3 კვერცხი შვრიით, სადილზე ქათმის ფილე წიწიბურით, წახემსებაზე მაწონი ვაშლით, ვახშამზე კი 150გ ხაჭო ბოსტნეულით!";
-                } else if (v.indexOf("შაურმ") !== -1) {
-                    reply = "შაურმა გემრიელია, მაგრამ ~850 კკალ-ია! თუ შეჭამ, დღეს ვახშამი მსუბუქი სალათით ჩაანაცვლე და 5,000 ნაბიჯი ზემოდან გაიარე!";
-                }
-                box.innerHTML += '<div class="msg-bubble coach">🤖 ' + reply + '</div>';
-                box.scrollTop = box.scrollHeight;
-            }, 300);
+            var endpoint = window.MY_FITNESS_AI_ENDPOINT || '';
+            if (!endpoint) {
+                appendAiMessage('თავისუფალი AI დიალოგი ჯერ არ არის დაკავშირებული. საჭიროა უსაფრთხო AI სერვერი. მანამდე შეგიძლია გამოიყენო აპლიკაციის კვების, ვარჯიშისა და პროგრესის ფუნქციები.', 'coach');
+                return;
+            }
+            if (!/^https:\/\//i.test(endpoint)) {
+                appendAiMessage('AI სერვერის მისამართი აუცილებლად უნდა იწყებოდეს https://-ით.', 'coach');
+                return;
+            }
+            aiBusy = true;
+            var btn = document.getElementById('ai-send');
+            if (btn) btn.disabled = true;
+            var pending = appendAiMessage('ვფიქრობ...', 'coach');
+            try {
+                var token = auth && auth.currentUser ? await auth.currentUser.getIdToken() : null;
+                if (!token) throw new Error('გთხოვ, შეხვიდე დადასტურებული ანგარიშით.');
+                var profile = {
+                    goalCal: Number(userDocData.goalCal) || null,
+                    goalProt: Number(userDocData.goalProt) || null,
+                    waterGoal: Number(userDocData.waterGoal) || null,
+                    targetWeight: Number(userDocData.targetWeight) || null
+                };
+                var response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json','Authorization':'Bearer ' + token},
+                    body: JSON.stringify({message:question, history:aiConversation.slice(-12), profile:profile})
+                });
+                if (!response.ok) throw new Error('სერვერის შეცდომა: ' + response.status);
+                var data = await response.json();
+                if (!data || typeof data.reply !== 'string' || !data.reply.trim()) throw new Error('სერვერმა სწორი პასუხი ვერ დააბრუნა.');
+                pending.textContent = data.reply.trim();
+                aiConversation.push({role:'user',content:question}, {role:'assistant',content:data.reply.trim()});
+                aiConversation = aiConversation.slice(-20);
+            } catch(e) {
+                pending.textContent = 'AI-სთან კავშირი ვერ დამყარდა: ' + e.message;
+            } finally {
+                aiBusy = false;
+                if (btn) btn.disabled = false;
+                var box = document.getElementById('ai-chat-box');
+                if (box) box.scrollTop = box.scrollHeight;
+            }
         }
 
         // SETTINGS & MODALS
@@ -2069,7 +2156,7 @@
                     html += '<div style="padding:8px; border-bottom:1px solid var(--glass-border); display:flex; justify-content:space-between; align-items:center;"><div><b>' + f.name + '</b> <small>' + f.cal + ' კკალ</small></div><button class="secondary sm" onclick="addSearchedFood(' + i + ')">+</button></div>';
                 }
             }
-            res.innerHTML = html;
+            res.innerHTML = html || '<div class="empty-state">ამ სახელით პროდუქტი ბაზაში ვერ მოიძებნა. შეგიძლია დაამატო ხელით.</div>';
         }
         function addSearchedFood(idx) {
             var f = foodDatabase[idx];
@@ -2083,5 +2170,8 @@
             showNotification(f.bad ? "❌ არაჯანსაღი საკვები!" : "✅ დაემატა (+10 XP)!", f.bad);
         }
     </script>
+<!-- AI endpoint contract: set window.MY_FITNESS_AI_ENDPOINT to an HTTPS server URL before this script runs.
+Server must validate Firebase ID token, check email_verified, enforce rate limits, hold AI provider key privately,
+accept JSON {message,history,profile} and return JSON {reply:string}. Never put provider secrets in this HTML. -->
 </body>
 </html>
