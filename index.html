@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Fitness Coach - Cloud Platform</title>
+    <title>My Fitness Coach - Ultimate Platform</title>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Firebase SDKs -->
@@ -12,91 +12,155 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Sans+Georgian:wght@400;600;700;800&display=swap');
         
         :root {
-            --bg: #0f172a;
-            --glass-bg: rgba(30, 41, 59, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --bg-grad: linear-gradient(135deg, #0b0f19 0%, #111827 50%, #0d1322 100%);
+            --glass-bg: rgba(22, 30, 46, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.12);
             --primary: #10b981;
-            --primary-dark: #059669;
+            --primary-glow: rgba(16, 185, 129, 0.4);
             --accent: #8b5cf6;
+            --accent-glow: rgba(139, 92, 246, 0.4);
             --text: #f8fafc;
             --text-muted: #94a3b8;
             --danger: #ef4444;
             --warning: #f59e0b;
         }
 
-        * { box-sizing: border-box; font-family: 'Noto Sans Georgian', sans-serif; }
+        * { box-sizing: border-box; font-family: 'Noto Sans Georgian', 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         
         body {
-            background-color: var(--bg);
+            background: var(--bg-grad);
             color: var(--text);
             margin: 0;
-            padding: 0 0 85px 0;
-            background-image: radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.15), transparent 25%),
-                              radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+            padding: 0 0 95px 0;
+            min-height: 100vh;
             background-attachment: fixed;
         }
 
-        .container { padding: 16px; max-width: 600px; margin: 0 auto; }
-        h1, h2, h3 { margin-top: 0; font-weight: 700; }
-        h1 { font-size: 22px; text-align: center; margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); display:flex; justify-content:space-between; align-items:center; }
-        h2 { font-size: 17px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;}
-
-        .card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); position: relative;}
-        input, select, button, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0, 0, 0, 0.2); color: var(--text); margin-bottom: 10px; outline: none; transition: 0.3s; }
-        input:focus, textarea:focus { border-color: var(--primary); }
+        .container { padding: 16px; max-width: 500px; margin: 0 auto; }
         
-        button { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border: none; font-weight: 600; cursor: pointer; color: white; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-top: 10px;
+        }
+        .app-logo {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 30%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        h2 { font-size: 16px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; margin-top: 0; margin-bottom: 12px; color: #fff;}
+
+        input, select, button, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(10, 15, 26, 0.4);
+            color: var(--text);
+            margin-bottom: 10px;
+            outline: none;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+        input:focus, textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--primary), #059669);
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
         button:active { transform: scale(0.98); }
-        button.secondary { background: rgba(255, 255, 255, 0.1); box-shadow: none; }
-        button.danger { background: var(--danger); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3); width: auto; padding: 6px 12px; font-size: 12px; }
-        button.accent { background: linear-gradient(135deg, var(--accent), #6d28d9); box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); }
+        button.secondary { background: rgba(255, 255, 255, 0.08); box-shadow: none; border: 1px solid var(--glass-border); }
+        button.danger { background: linear-gradient(135deg, var(--danger), #dc2626); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); width: auto; padding: 6px 12px; font-size: 11px; border-radius: 8px; }
+        button.accent { background: linear-gradient(135deg, var(--accent), #6d28d9); box-shadow: 0 4px 15px var(--accent-glow); }
 
         .flex-row { display: flex; gap: 10px; }
         .flex-row > * { flex: 1; }
 
-        .progress-bg { background: rgba(0, 0, 0, 0.3); border-radius: 8px; height: 12px; width: 100%; overflow: hidden; margin: 8px 0; }
-        .progress-fill { background: linear-gradient(90deg, var(--primary), var(--accent)); height: 100%; border-radius: 8px; transition: width 0.5s ease; }
+        .progress-bg { background: rgba(255, 255, 255, 0.06); border-radius: 12px; height: 10px; width: 100%; overflow: hidden; margin: 8px 0; }
+        .progress-fill { background: linear-gradient(90deg, var(--primary), #34d399); height: 100%; border-radius: 12px; transition: width 0.6s ease; box-shadow: 0 0 10px var(--primary); }
 
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; margin-bottom: 10px; }
-        .stat-box { background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); }
-        .stat-value { font-size: 20px; font-weight: 700; color: var(--primary); }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .stat-box { background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        .stat-value { font-size: 20px; font-weight: 800; color: var(--primary); }
 
-        .list-item { display: flex; flex-direction: column; padding: 10px; border-bottom: 1px solid var(--glass-border); border-radius: 8px; margin-bottom: 8px; background: rgba(0,0,0,0.1); }
-        .list-item:last-child { border-bottom: none; }
+        .list-item { display: flex; flex-direction: column; padding: 10px 12px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
         .item-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .item-details { display: flex; flex-direction: column; }
-        .item-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height:1.4; }
+        .item-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.4; }
         
-        .bad-food { border: 1px solid var(--danger); background: rgba(239, 68, 68, 0.1); }
-        .bad-food-warning { color: #fca5a5; font-size: 11px; margin-top: 8px; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 4px; border-left: 3px solid var(--danger); }
+        .bad-food { border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); }
+        .bad-food-warning { color: #fca5a5; font-size: 11px; margin-top: 6px; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 6px; border-left: 3px solid var(--danger); }
 
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-around; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); padding: 12px 0; border-top: 1px solid var(--glass-border); z-index: 100; }
-        .nav-btn { background: none; border: none; box-shadow: none; padding: 0; color: var(--text-muted); font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 4px; width: auto; margin: 0; }
-        .nav-btn.active { color: var(--primary); }
-        .nav-icon { font-size: 22px; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; background: rgba(11, 15, 25, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 10px 0 14px 0; border-top: 1px solid var(--glass-border); z-index: 100; }
+        .nav-btn { background: none; border: none; box-shadow: none; padding: 0; color: var(--text-muted); font-size: 9px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 3px; width: auto; margin: 0; }
+        .nav-btn.active { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
+        .nav-icon { font-size: 20px; }
 
-        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        .chat-bubble { background: rgba(139, 92, 246, 0.2); border-left: 3px solid var(--accent); padding: 12px; border-radius: 0 8px 8px 8px; margin-bottom: 15px; font-size: 14px; line-height: 1.5; }
-        .plan-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid var(--primary); }
-        
-        #notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--primary-dark); color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .chat-container { max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+        .chat-bubble { padding: 10px 14px; border-radius: 14px; font-size: 12px; max-width: 82%; line-height: 1.4; }
+        .chat-bubble.user { background: linear-gradient(135deg, var(--accent), #6d28d9); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .chat-bubble.coach { background: rgba(16, 185, 129, 0.15); border: 1px solid var(--primary); color: white; align-self: flex-start; border-bottom-left-radius: 2px; }
+
+        #notification { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); background: var(--primary-dark); color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: 700; box-shadow: 0 10px 25px rgba(0,0,0,0.4); z-index: 3000; opacity: 0; pointer-events: none; transition: all 0.3s ease; }
         #notification.danger { background: var(--danger); }
-        .fasting-box { text-align: center; padding: 15px; border-radius: 12px; background: rgba(139, 92, 246, 0.1); border: 1px solid var(--accent); }
-        .fasting-time { font-size: 24px; font-weight: bold; color: var(--accent); margin: 10px 0; font-variant-numeric: tabular-nums;}
         
-        /* Auth Overlay */
-        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .auth-card { background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); padding: 24px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; }
+        .fasting-box { text-align: center; padding: 14px; border-radius: 16px; background: rgba(139, 92, 246, 0.08); border: 1px solid var(--accent-glow); }
+        .fasting-time { font-size: 24px; font-weight: 800; color: #a78bfa; margin: 8px 0; font-variant-numeric: tabular-nums;}
+        
+        .quick-foods { display:flex; overflow-x:auto; gap:8px; padding-bottom:4px; scrollbar-width: none; }
+        .quick-foods::-webkit-scrollbar { display: none; }
+        .quick-btn { white-space:nowrap; flex:0 0 auto; width:auto; padding:6px 12px; font-size:11px; border-radius:10px; }
 
-        .user-row { background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); padding: 12px; border-radius: 10px; margin-bottom: 10px; }
-        .user-row.alert { border-color: var(--danger); background: rgba(239,68,68,0.1); }
+        .streak-badge { background: linear-gradient(135deg, #f59e0b, #ef4444); padding: 4px 10px; border-radius: 16px; font-size: 11px; font-weight: 800; color: white; }
+
+        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-grad); z-index: 2000; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .auth-card { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); padding: 28px 20px; border-radius: 24px; width: 100%; max-width: 360px; text-align: center; }
+
+        .user-row { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 12px; border-radius: 14px; margin-bottom: 10px; }
+        .user-row.alert { border-color: rgba(239, 68, 68, 0.5); background: rgba(239,68,68,0.1); }
+        
+        .plan-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 10px 12px; border-radius: 12px; margin-bottom: 8px; border-left: 3px solid var(--primary); }
+        .sleep-feedback { font-size: 12px; margin-top: 8px; padding: 8px; border-radius: 8px; display: none; }
+        .sleep-feedback.good { background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--primary); display: block;}
+        .sleep-feedback.bad { background: rgba(239, 68, 68, 0.1); border-left: 3px solid var(--danger); display: block;}
+        
+        .photo-gallery { display: flex; gap: 8px; overflow-x: auto; margin-top: 8px; }
+        .photo-card { position: relative; min-width: 80px; height: 80px; border-radius: 8px; overflow: hidden; border: 1px solid var(--glass-border); background:#000;}
+        .photo-card img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -106,20 +170,23 @@
     <!-- Auth Screen -->
     <div id="auth-screen">
         <div class="auth-card">
-            <h2> My Fitness Coach</h2>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">შედი ან დარეგისტრირდი პროგრესის შესანახად</p>
+            <h2 style="font-size: 22px; justify-content: center; gap: 6px; margin-bottom: 4px;">🏋️ My Fitness Coach</h2>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">შედი ან დარეგისტრირდი პროგრესის შესანახად</p>
             <input type="email" id="auth-email" placeholder="ელ-ფოსტა (Email)">
             <input type="password" id="auth-password" placeholder="პაროლი">
-            <button onclick="loginUser()">შესვლა</button>
+            <button onclick="loginUser()" style="margin-top: 6px;">შესვლა</button>
             <button class="secondary" style="margin-top: 8px;" onclick="registerUser()">რეგისტრაცია</button>
         </div>
     </div>
 
     <div class="container" id="app-container" style="display:none;">
-        <h1>
-            <span>My Fitness Coach</span>
-            <button class="danger" onclick="logoutUser()" style="padding:4px 8px; font-size:10px;">გამოსვლა</button>
-        </h1>
+        <div class="app-header">
+            <div class="app-logo">My Fitness Coach</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div class="streak-badge" id="streak-counter">🔥 0 დღე</div>
+                <button class="danger" onclick="logoutUser()">გამოსვლა</button>
+            </div>
+        </div>
 
         <!-- TAB 1: კვება -->
         <div id="tab-diet" class="tab-content active">
@@ -136,10 +203,33 @@
                     </div>
                 </div>
                 <div class="progress-bg"><div class="progress-fill" id="cal-progress" style="width: 0%;"></div></div>
-                <div style="text-align:center; font-size:12px; color:var(--text-muted); margin-top:5px;">ცილა: <span id="prot-eaten">0</span>გ / 140გ</div>
+                <div style="text-align:center; font-size:12px; color:var(--text-muted); margin-top:6px;">ცილა: <span id="prot-eaten" style="color:#fff; font-weight:700;">0</span>გ / 140გ</div>
             </div>
 
-            <div class="card" style="border-color: var(--accent);">
+            <!-- შენახული შაბლონები & სწრაფი ქართული ბაზა -->
+            <div class="card">
+                <h2>⭐ სწრაფი დამატება & შაბლონები</h2>
+                <div class="quick-foods">
+                    <button class="secondary quick-btn" onclick="addExactFood('🍳 სტანდარტული საუზმე', 600, 35)">🍳 საუზმე (600კკალ)</button>
+                    <button class="secondary quick-btn" onclick="addExactFood('🍗 ფილე & წიწიბურა', 550, 50)">🍗 სადილი (550კკალ)</button>
+                    <button class="secondary quick-btn" onclick="addExactFood('🧀 სულგუნი (50გ)', 150, 10)">🧀 სულგუნი</button>
+                    <button class="secondary quick-btn" onclick="addExactFood('🥣 მაწონი (1 ჭიქა)', 120, 8)">🥣 მაწონი</button>
+                    <button class="danger quick-btn" style="background:rgba(239, 68, 68, 0.2);" onclick="smartAddFood('ხაჭაპური 1 ნაჭერი')">🥖 ხაჭაპური ⚠️</button>
+                    <button class="danger quick-btn" style="background:rgba(239, 68, 68, 0.2);" onclick="smartAddFood('ხინკალი 5 ცალი')">🥟 ხინკალი ⚠️</button>
+                </div>
+            </div>
+
+            <!-- ინტერვალური შიმშილი -->
+            <div class="card">
+                <h2>⏳ 16:8 ინტერვალური შიმშილი</h2>
+                <div class="fasting-box">
+                    <div id="fasting-msg" style="font-size:12px; color:var(--text-muted);">ბოლო კვების შემდეგ ჩართე ტაიმერი</div>
+                    <div class="fasting-time" id="fasting-time">00:00:00</div>
+                    <button id="fasting-btn" class="accent" style="margin:0; width:100%;" onclick="toggleFasting()">⏱️ შიმშილის დაწყება</button>
+                </div>
+            </div>
+
+            <div class="card" style="border-color: rgba(139, 92, 246, 0.3);">
                 <h2>🤖 ჭკვიანი მთვლელი</h2>
                 <textarea id="smart-food-input" rows="2" placeholder="ჩაწერე რა ჭამე (მაგ: 2 კვერცხი და ყველი)..."></textarea>
                 <button class="accent" onclick="smartAddFood()">✨ ავტომატური დათვლა</button>
@@ -151,12 +241,28 @@
             </div>
         </div>
 
-        <!-- TAB 2: აქტივობა -->
+        <!-- TAB 2: რეჟიმი & კალენდარი -->
+        <div id="tab-schedule" class="tab-content">
+            <div class="card">
+                <h2>⏱️ სამუშაო კალენდარი & რეჟიმი</h2>
+                <div class="item-sub" style="margin-bottom:12px;">მიუთითე დრო და აპლიკაცია კვების იდეალურ გრაფიკს შეგიდგენს.</div>
+                <div class="flex-row">
+                    <div><label style="font-size:11px; color:var(--text-muted);">დაწყება</label><input type="time" id="work-start" value="10:00" onchange="generateSchedule()"></div>
+                    <div><label style="font-size:11px; color:var(--text-muted);">დასრულება</label><input type="time" id="work-end" value="19:00" onchange="generateSchedule()"></div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>📅 დღის იდეალური განრიგი</h2>
+                <div id="schedule-list"></div>
+            </div>
+        </div>
+
+        <!-- TAB 3: აქტივობა & ვარჯიში -->
         <div id="tab-activity" class="tab-content">
             <div class="card">
                 <h2>💧 წყალი</h2>
-                <div class="progress-bg"><div class="progress-fill" id="water-progress" style="width: 0%; background: #3b82f6;"></div></div>
-                <div style="text-align:center; margin-bottom:10px;"><span id="water-val" style="font-weight:bold; color:#3b82f6;">0</span> / 2500 მლ</div>
+                <div class="progress-bg"><div class="progress-fill" id="water-progress" style="width: 0%; background: linear-gradient(90deg, #3b82f6, #60a5fa);"></div></div>
+                <div style="text-align:center; margin-bottom:10px;"><span id="water-val" style="font-weight:800; font-size:16px; color:#60a5fa;">0</span> / 2500 მლ</div>
                 <div class="flex-row">
                     <button class="secondary" onclick="addWater(150)">+150 მლ</button>
                     <button class="secondary" onclick="addWater(250)">+250 მლ</button>
@@ -166,57 +272,139 @@
 
             <div class="card">
                 <h2>🚶 ნაბიჯები</h2>
-                <div class="progress-bg"><div class="progress-fill" id="step-progress" style="width: 0%; background: #10b981;"></div></div>
-                <div style="text-align:center; margin-bottom:10px;"><span id="step-val" style="font-weight:bold; color:#10b981;">0</span> / 10,000</div>
+                <div class="progress-bg"><div class="progress-fill" id="step-progress" style="width: 0%;"></div></div>
+                <div style="text-align:center; margin-bottom:10px;"><span id="step-val" style="font-weight:800; font-size:16px; color:var(--primary);">0</span> / 10,000</div>
                 <div class="flex-row">
-                    <input type="number" id="steps-input" placeholder="გავლ. ნაბიჯები">
-                    <button class="secondary" onclick="addSteps()">დამატება</button>
+                    <input type="number" id="steps-input" placeholder="გავლ. ნაბიჯები" style="margin:0;">
+                    <button class="secondary" style="width:auto; padding:0 16px;" onclick="addSteps()">დამატება</button>
                 </div>
+            </div>
+
+            <div class="card" style="border-color: rgba(245, 158, 11, 0.4);">
+                <h2>🔥 15-წთ "Busy" ვარჯიში</h2>
+                <div id="workout-timer-display" class="fasting-box" style="display:none; margin-top:8px; margin-bottom:8px;">
+                    <div id="w-time" class="fasting-time" style="color:var(--warning);">15:00</div>
+                    <div class="item-sub" style="color:var(--text);">გააკეთე 4 წრე: 10 ჩაჯდომა, 10 აზიდვა, 30 წმ პლანკა.</div>
+                </div>
+                <button id="workout-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706);" onclick="startWorkoutTimer()">⏱️ ვარჯიშის დაწყება</button>
+            </div>
+
+            <div class="card">
+                <h2>📖 ვარჯიშის ინსტრუქციები</h2>
+                <div class="item-sub">
+                    <b>🏋️ ჩაჯდომები:</b> ზურგი სწორად, ჩადი ისე თითქოს სკამზე ჯდები.<br>
+                    <b>💪 აზიდვები:</b> შეგიძლია მუხლებიდანაც. იდაყვები სხეულთან ახლოს.<br>
+                    <b>🧘 პლანკა:</b> სხეული ერთ სწორ ხაზზე, მუცელი შეკუმშული.
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🎲 სახალისო აქტივობა (NEAT)</h2>
+                <div id="fun-activity" class="item-sub" style="font-size:13px; font-weight:bold; color:var(--primary); margin-bottom:8px; background:rgba(16, 185, 129, 0.1); padding:8px; border-radius:8px;">დააჭირე ღილაკს ახალი დავალებისთვის!</div>
+                <button class="secondary" onclick="generateFunActivity()">🎲 ახალი იდეა</button>
+            </div>
+
+            <div class="card">
+                <h2>🌙 ძილის ანალიზატორი</h2>
+                <div class="flex-row">
+                    <div><label style="font-size:11px; color:var(--text-muted);">დავიძინე</label><input type="time" id="sleep-start" value="23:30"></div>
+                    <div><label style="font-size:11px; color:var(--text-muted);">გავიღვიძე</label><input type="time" id="sleep-end" value="07:30"></div>
+                </div>
+                <button class="secondary" onclick="calculateSleep()">შეფასება</button>
+                <div id="sleep-feedback" class="sleep-feedback"></div>
             </div>
         </div>
 
-        <!-- TAB 3: მწვრთნელი -->
+        <!-- TAB 4: მწვრთნელი & 1-on-1 ჩატი -->
         <div id="tab-coach" class="tab-content">
-            <div class="card">
-                <h2>🤖 მწვრთნელის შეფასება</h2>
-                <div class="chat-bubble" id="coach-message">
-                    მე შენი პირადი მწვრთნელი ვარ. ჩაიწერე დღევანდელი მონაცემები და დააჭირე შეფასებას.
+            <div class="card" style="border-color: rgba(139, 92, 246, 0.4);">
+                <h2>💬 1-on-1 ჩატი მწვრთნელთან</h2>
+                <div class="chat-container" id="chat-box">
+                    <div class="chat-bubble coach">გამარჯობა! მოგწერე ნებისმიერი კითხვა.</div>
                 </div>
-                <button onclick="evaluateDay()">შეაფასე ჩემი დღე</button>
+                <div class="flex-row">
+                    <input type="text" id="chat-input" placeholder="მიწერე მწვრთნელს..." style="margin:0;">
+                    <button class="accent" style="width:auto; padding:0 16px;" onclick="sendMessage()">📩</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📊 კვირის რეპორტი (Weekly Report)</h2>
+                <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); padding: 14px; border-radius: 14px; text-align: center;">
+                    <p style="font-size:12px; color:var(--text-muted); margin:6px 0;" id="weekly-report-text">მონაცემები გენერირდება...</p>
+                    <button class="secondary" style="width:100%; justify-content:center; margin-top:8px;" onclick="shareReport()">📤 რეპორტის გაზიარება</button>
+                </div>
             </div>
 
             <div class="card">
                 <h2>⚖️ წონის ისტორია (მიზანი: 70 კგ)</h2>
                 <div class="flex-row">
-                    <input type="number" id="weight-input" placeholder="დღევანდელი წონა" step="0.1">
-                    <button onclick="addWeight()">დამატება</button>
+                    <input type="number" id="weight-input" placeholder="დღევანდელი წონა" step="0.1" style="margin:0;">
+                    <button style="width:auto; padding:0 16px;" onclick="addWeight()">დამატება</button>
                 </div>
-                <canvas id="weightChart" width="100" height="60" style="margin-top:15px;"></canvas>
+                <canvas id="weightChart" width="100" height="60" style="margin-top:14px;"></canvas>
+            </div>
+
+            <div class="card">
+                <h2>📸 ვიზუალური პროგრესი</h2>
+                <input type="file" accept="image/*" onchange="handlePhotoUpload(event)" style="background:transparent; border:none; padding:0; color:var(--primary);">
+                <div id="photo-gallery" class="photo-gallery"></div>
             </div>
         </div>
 
-        <!-- TAB 4: ადმინ პანელი (მხოლოდ მწვრთნელისთვის) -->
+        <!-- TAB 5: ბიუჯეტი -->
+        <div id="tab-budget" class="tab-content">
+            <div class="card">
+                <h2>💰 თვის ბიუჯეტი: <span id="display-budget-total">250</span> ₾</h2>
+                <div class="stat-grid">
+                    <div class="stat-box"><div class="stat-value" id="budget-spent" style="color:var(--danger)">0</div><div class="item-sub">დახარჯული (₾)</div></div>
+                    <div class="stat-box"><div class="stat-value" id="budget-rem" style="color:var(--primary)">250</div><div class="item-sub">დარჩენილი (₾)</div></div>
+                </div>
+                <div class="progress-bg"><div class="progress-fill" id="budget-progress" style="width: 0%; background: var(--danger);"></div></div>
+                <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:4px;" id="budget-daily"></div>
+            </div>
+
+            <div class="card">
+                <h2>🛒 საყიდლების сია (ჯანსაღი)</h2>
+                <div id="shopping-list"></div>
+            </div>
+
+            <div class="card">
+                <h2>➕ სხვა ხარჯის ჩაწერა</h2>
+                <input type="text" id="expense-name" placeholder="რა ვიყიდე">
+                <input type="number" id="expense-amount" placeholder="ფასი ლარებში" step="0.1">
+                <button onclick="addExpense()">დამატება</button>
+            </div>
+        </div>
+
+        <!-- TAB 6: ადმინ პანელი (მონიტორინგი) -->
         <div id="tab-admin" class="tab-content">
-            <div class="card" style="border-color: var(--accent);">
+            <div class="card" style="border-color: rgba(139, 92, 246, 0.4);">
                 <h2>👑 მწვრთნელის მონიტორინგი</h2>
-                <p style="font-size: 12px; color: var(--text-muted);">აქ რეალურ დროში დაინახავ ყველა მომხმარებლის პროგრესს და დარღვევებს!</p>
                 <div id="admin-user-list">
                     <div class="item-sub">მონაცემები იტვირთება...</div>
                 </div>
             </div>
+            
+            <div class="card">
+                <h2>⚙️ მონაცემების Backup</h2>
+                <button class="secondary" onclick="backupData()">📥 პროგრესის ჩამოტვირთვა</button>
+            </div>
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation (6 Tabs) -->
     <div class="bottom-nav" id="app-nav" style="display:none;">
         <button class="nav-btn active" onclick="switchTab('diet', this)"><span class="nav-icon">🍏</span><span>კვება</span></button>
+        <button class="nav-btn" onclick="switchTab('schedule', this)"><span class="nav-icon">⏱️</span><span>რეჟიმი</span></button>
         <button class="nav-btn" onclick="switchTab('activity', this)"><span class="nav-icon">🏃</span><span>აქტივობა</span></button>
-        <button class="nav-btn" onclick="switchTab('coach', this)"><span class="nav-icon">🤖</span><span>მწვრთნელი</span></button>
-        <button class="nav-btn" onclick="switchTab('admin', this)"><span class="nav-icon">👑</span><span>მონიტორინგი</span></button>
+        <button class="nav-btn" onclick="switchTab('coach', this)"><span class="nav-icon">💬</span><span>ჩატი</span></button>
+        <button class="nav-btn" onclick="switchTab('budget', this)"><span class="nav-icon">💰</span><span>ბიუჯეტი</span></button>
+        <button class="nav-btn" onclick="switchTab('admin', this)"><span class="nav-icon">👑</span><span>ადმინი</span></button>
     </div>
 
     <script>
-        // FIREBASE INITALIZATION
+        // FIREBASE INITIALIZATION
         const firebaseConfig = {
           apiKey: "AIzaSyCjFhlvbcKuXNweVxSVexmNw_3hSp5gGK8",
           authDomain: "myfitnesscoach-90fa9.firebaseapp.com",
@@ -232,8 +420,30 @@
         const db = firebase.firestore();
 
         let currentUser = null;
-        let userData = { foods: [], water: 0, steps: 0, weights: [{ date: '2026-10-20', weight: 82 }] };
         const today = new Date().toISOString().split('T')[0];
+        const currentMonth = today.slice(0, 7);
+
+        let userData = {
+            foods: [], water: 0, steps: 0, weights: [{ date: today, weight: 82 }],
+            fastingStart: null, streak: 1, expenses: [], photos: []
+        };
+
+        const UNHEALTHY = ['ტორტი', 'შაქარი', 'ენერგეტიკული', 'ნუდელსი', 'ჩიფსი', 'შოკოლადი', 'მაიონეზი', 'კოლა', 'ხაჭაპური', 'ფასტფუდი', 'ბურგერი', 'პიცა', 'შაურმა', 'ალკოჰოლი', 'ხინკალი'];
+        const SHOPPING_ITEMS = [
+            { name: "კვერცხი (30 ცალი)", price: 15 },
+            { name: "ქათმის ფილე/ბარძაყი (1 კგ)", price: 12 },
+            { name: "ხაჭო 5% (500 გრ)", price: 6 },
+            { name: "შვრია (1 კგ)", price: 4 },
+            { name: "წიწიბურა/ბრინჯი", price: 5 },
+            { name: "ბოსტნეული (კვირის)", price: 15 }
+        ];
+        const FUN_ACTIVITIES = [
+            "იცეკვე 3 საყვარელ სიმღერაზე! 🎵 (~50 კკალ)",
+            "გაასუფთავე ოთახი და დაალაგე ნივთები 🧹 (~100 კკალ)",
+            "გააკეთე 20 ჩაჯდომა ტელევიზორის რეკლამების დროს 📺",
+            "იარე კიბეზე ლიფტის ნაცვლად 🏢 (~30 კკალ)",
+            "10 წუთი იარე ოთახში ტელეფონზე საუბრისას 📱 (~40 კკალ)"
+        ];
 
         function showNotification(msg, isDanger = false) {
             const notif = document.getElementById('notification');
@@ -252,6 +462,8 @@
                 document.getElementById('app-nav').style.display = 'flex';
                 loadUserData();
                 loadAdminDashboard();
+                listenToChat();
+                generateSchedule();
             } else {
                 currentUser = null;
                 document.getElementById('auth-screen').style.display = 'flex';
@@ -264,30 +476,23 @@
             let email = document.getElementById('auth-email').value;
             let pass = document.getElementById('auth-password').value;
             if(!email || !pass) return alert("შეიყვანე Email და პაროლი!");
-            auth.createUserWithEmailAndPassword(email, pass)
-                .then(() => alert("რეგისტრაცია წარმატებით გაიარე!"))
-                .catch(err => alert(err.message));
+            auth.createUserWithEmailAndPassword(email, pass).catch(err => alert(err.message));
         }
 
         function loginUser() {
             let email = document.getElementById('auth-email').value;
             let pass = document.getElementById('auth-password').value;
             if(!email || !pass) return alert("შეიყვანე Email და პაროლი!");
-            auth.signInWithEmailAndPassword(email, pass)
-                .catch(err => alert(err.message));
+            auth.signInWithEmailAndPassword(email, pass).catch(err => alert(err.message));
         }
 
         function logoutUser() { auth.signOut(); }
 
-        // CLOUD DATA MANAGEMENT
+        // CLOUD STORAGE
         function loadUserData() {
             db.collection('users').doc(currentUser.uid).collection('days').doc(today)
                 .onSnapshot(doc => {
-                    if (doc.exists) {
-                        userData = doc.data();
-                    } else {
-                        userData = { foods: [], water: 0, steps: 0, weights: [{ date: today, weight: 82 }] };
-                    }
+                    if (doc.exists) userData = Object.assign(userData, doc.data());
                     updateUI();
                 });
         }
@@ -298,8 +503,74 @@
             db.collection('users').doc(currentUser.uid).collection('days').doc(today).set(userData);
         }
 
-        // UI & APP LOGIC
+        // CHAT
+        function sendMessage() {
+            let text = document.getElementById('chat-input').value.trim();
+            if(!text) return;
+            db.collection('chats').doc(currentUser.uid).collection('messages').add({
+                sender: currentUser.email,
+                text: text,
+                time: new Date()
+            });
+            document.getElementById('chat-input').value = '';
+        }
+
+        function listenToChat() {
+            db.collection('chats').doc(currentUser.uid).collection('messages').orderBy('time', 'asc')
+                .onSnapshot(snapshot => {
+                    let html = '';
+                    snapshot.docs.forEach(doc => {
+                        let msg = doc.data();
+                        let isMe = msg.sender === currentUser.email;
+                        html += `<div class="chat-bubble ${isMe ? 'user' : 'coach'}">${msg.text}</div>`;
+                    });
+                    document.getElementById('chat-box').innerHTML = html || '<div class="chat-bubble coach">გამარჯობა! მოგწერე კითხვები.</div>';
+                });
+        }
+
+        // Fasting
+        let fastingInterval;
+        function updateFastingUI() {
+            const btn = document.getElementById('fasting-btn');
+            const msg = document.getElementById('fasting-msg');
+            const timeEl = document.getElementById('fasting-time');
+
+            if (userData.fastingStart) {
+                btn.innerHTML = "🛑 შიმშილის დასრულება";
+                btn.style.background = "var(--danger)";
+                msg.innerText = "მიმდინარეობს ცხიმის წვის ფაზა (16 სთ)";
+                clearInterval(fastingInterval);
+                fastingInterval = setInterval(() => {
+                    let diff = Date.now() - userData.fastingStart;
+                    let h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                    let m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                    let s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                    timeEl.innerText = `${h}:${m}:${s}`;
+                }, 1000);
+            } else {
+                clearInterval(fastingInterval);
+                btn.innerHTML = "⏱️ შიმშილის დაწყება";
+                btn.style.background = "";
+                msg.innerText = "ბოლო კვების შემდეგ ჩართე ტაიმერი";
+                timeEl.innerText = "00:00:00";
+            }
+        }
+
+        function toggleFasting() {
+            if (userData.fastingStart) {
+                userData.fastingStart = null;
+                showNotification("🎉 შიმშილი დასრულდა!");
+            } else {
+                userData.fastingStart = Date.now();
+                showNotification("⏳ ტაიმერი ჩაირთო.");
+            }
+            saveCloudData(); updateFastingUI();
+        }
+
+        // UI RENDER
         function updateUI() {
+            document.getElementById('streak-counter').innerText = `🔥 ${userData.streak || 1} დღე`;
+
             let totalCal = (userData.foods || []).reduce((acc, f) => acc + Number(f.cal), 0);
             let totalProt = (userData.foods || []).reduce((acc, f) => acc + Number(f.prot), 0);
             
@@ -321,16 +592,44 @@
 
             document.getElementById('step-val').innerText = userData.steps || 0;
             document.getElementById('step-progress').style.width = Math.min(100, ((userData.steps || 0) / 10000) * 100) + "%";
+
+            // Budget
+            let spentThisMonth = (userData.expenses || []).filter(e => e.date && e.date.startsWith(currentMonth)).reduce((acc, e) => acc + Number(e.amount), 0);
+            document.getElementById('budget-spent').innerText = spentThisMonth.toFixed(1);
+            document.getElementById('budget-rem').innerText = (250 - spentThisMonth).toFixed(1);
+            document.getElementById('budget-progress').style.width = Math.min(100, (spentThisMonth / 250) * 100) + "%";
+
+            let shopHtml = '';
+            SHOPPING_ITEMS.forEach(item => {
+                shopHtml += `<div class="list-item"><div class="item-details"><b>${item.name}</b><span class="item-sub">~${item.price} ₾</span></div><button class="secondary" style="width:auto; padding:6px 12px; font-size:12px;" onclick="quickBuy('${item.name}', ${item.price})">ვიყიდე</button></div>`;
+            });
+            document.getElementById('shopping-list').innerHTML = shopHtml;
+
+            // Photos
+            let phtml = '';
+            (userData.photos || []).forEach((p, i) => {
+                phtml += `<div class="photo-card"><img src="${p.src}"></div>`;
+            });
+            document.getElementById('photo-gallery').innerHTML = phtml || '<div class="item-sub">ფოტოები არ არის.</div>';
+
+            document.getElementById('weekly-report-text').innerText = `კალორიები: ${totalCal} კკალ | წყალი: ${userData.water || 0} მლ | ნაბიჯები: ${userData.steps || 0}`;
+
+            updateFastingUI();
         }
 
-        function smartAddFood() {
-            let text = document.getElementById('smart-food-input').value.trim().toLowerCase();
+        function addExactFood(name, cal, prot) {
+            if(!userData.foods) userData.foods = [];
+            userData.foods.push({ name, cal, prot, isUnhealthy: false });
+            saveCloudData(); showNotification(`✅ დაემატა: ${name}`);
+        }
+
+        function smartAddFood(prefill = "") {
+            let text = prefill || document.getElementById('smart-food-input').value.trim().toLowerCase();
             if(!text) return;
-            const UNHEALTHY = ['ტორტი', 'შაქარი', 'ენერგეტიკული', 'ნუდელსი', 'ჩიფსი', 'შოკოლადი', 'მაიონეზი', 'კოლა', 'ხაჭაპური', 'ფასტფუდი', 'ბურგერი', 'პიცა', 'შაურმა', 'ალკოჰოლი', 'ხინკალი'];
             let isUnhealthy = UNHEALTHY.some(word => text.includes(word));
             let estCal = text.length * 15 + Math.floor(Math.random() * 50);
             let estProt = Math.floor(text.length / 3);
-            let warningMsg = isUnhealthy ? "შეიცავს არაჯანსაღ პროდუქტს. წონის კლებას აფერხებს!" : "";
+            let warningMsg = isUnhealthy ? "შეიცავს არაჯანსაღ პროდუქტს!" : "";
 
             if(!userData.foods) userData.foods = [];
             userData.foods.push({ name: text, cal: estCal, prot: estProt, isUnhealthy, warning: warningMsg });
@@ -339,10 +638,91 @@
         }
 
         function deleteFood(i) { userData.foods.splice(i, 1); saveCloudData(); }
-        function addWater(ml) { userData.water = (userData.water || 0) + ml; saveCloudData(); }
+        function addWater(ml) { userData.water = (userData.water || 0) + ml; saveCloudData(); showNotification(`💧 +${ml}მლ წყალი`); }
         function addSteps() { let s = parseInt(document.getElementById('steps-input').value)||0; userData.steps = (userData.steps || 0) + s; saveCloudData(); document.getElementById('steps-input').value=''; }
 
-        // ADMIN DASHBOARD (მონიტორინგი)
+        function addExpense() {
+            let n = document.getElementById('expense-name').value, a = document.getElementById('expense-amount').value;
+            if(!n || !a) return;
+            if(!userData.expenses) userData.expenses = [];
+            userData.expenses.push({ date: today, name: n, amount: parseFloat(a) });
+            document.getElementById('expense-name').value = ''; document.getElementById('expense-amount').value = '';
+            saveCloudData(); showNotification("💰 ხარჯი დაემატა");
+        }
+        function quickBuy(n, p) { if(!userData.expenses) userData.expenses = []; userData.expenses.push({ date: today, name: n, amount: parseFloat(p) }); saveCloudData(); showNotification("✅ ხარჯი დაემატა"); }
+
+        function generateFunActivity() { document.getElementById('fun-activity').innerText = FUN_ACTIVITIES[Math.floor(Math.random() * FUN_ACTIVITIES.length)]; }
+
+        let wTimer;
+        function startWorkoutTimer() {
+            let btn = document.getElementById('workout-btn'), disp = document.getElementById('workout-timer-display'), tDisp = document.getElementById('w-time');
+            let timeLeft = 15 * 60;
+            disp.style.display = 'block'; btn.style.display = 'none';
+            clearInterval(wTimer);
+            wTimer = setInterval(() => {
+                if(timeLeft <= 0) { clearInterval(wTimer); tDisp.innerText = "დასრულებულია!"; btn.style.display = 'flex'; showNotification("🎉 ვარჯიში დასრულდა!"); return;}
+                timeLeft--;
+                let m = Math.floor(timeLeft/60).toString().padStart(2,'0'), s = (timeLeft%60).toString().padStart(2,'0');
+                tDisp.innerText = m+":"+s;
+            }, 1000);
+        }
+
+        function calculateSleep() {
+            let start = document.getElementById('sleep-start').value, end = document.getElementById('sleep-end').value;
+            let [h1, m1] = start.split(':').map(Number), [h2, m2] = end.split(':').map(Number);
+            let startMin = h1 * 60 + m1, endMin = h2 * 60 + m2;
+            if (endMin < startMin) endMin += 24 * 60; 
+            let hrs = ((endMin - startMin) / 60).toFixed(1);
+            userData.sleepHrs = hrs; saveCloudData();
+
+            let fb = document.getElementById('sleep-feedback');
+            fb.className = hrs < 6.5 ? 'sleep-feedback bad' : 'sleep-feedback good';
+            fb.innerHTML = hrs < 6.5 ? `⚠️ <b>გეძინა ${hrs} საათი.</b> უძილობა აჩერებს ცხიმის წვას.` : `✅ <b>გეძინა ${hrs} საათი.</b> იდეალურია!`;
+        }
+
+        function timeMath(timeStr, addMins) { let [h, m] = timeStr.split(':').map(Number); let d = new Date(); d.setHours(h, m + addMins, 0); return d.toTimeString().slice(0, 5); }
+        function generateSchedule() {
+            let start = document.getElementById('work-start').value, end = document.getElementById('work-end').value;
+            document.getElementById('schedule-list').innerHTML = `
+                <div class="plan-item"><div><b>${timeMath(start, -90)}</b><br><span class="item-sub">გაღვიძება, 1 ჭიქა წყალი და საუზმე.</span></div></div>
+                <div class="plan-item"><div><b>${start}</b><br><span class="item-sub">სამსახურის დაწყება. წყლით მომარაგება.</span></div></div>
+                <div class="plan-item"><div><b>${timeMath(start, 270)}</b><br><span class="item-sub">სადილი (კონტეინერით).</span></div></div>
+                <div class="plan-item"><div><b>${end}</b><br><span class="item-sub">დასრულება. ფეხით სიარული.</span></div></div>
+                <div class="plan-item"><div><b>${timeMath(end, 90)}</b><br><span class="item-sub">ვახშამი და 16სთ ტაიმერის ჩართვა.</span></div></div>
+            `;
+        }
+
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas'); const MAX = 300; const scale = Math.min(MAX/img.width, MAX/img.height, 1);
+                    canvas.width = img.width * scale; canvas.height = img.height * scale;
+                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    if(!userData.photos) userData.photos=[];
+                    userData.photos.push({ date: today, src: canvas.toDataURL('image/jpeg', 0.5) });
+                    if(userData.photos.length > 3) userData.photos.shift();
+                    saveCloudData();
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function shareReport() {
+            if (navigator.share) navigator.share({ title: 'My Fitness Coach Report', text: document.getElementById('weekly-report-text').innerText });
+            else alert("რეპორტი დაკოპირებულია!");
+        }
+
+        function backupData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userData));
+            const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "my_coach_backup.json");
+            document.body.appendChild(dl); dl.click(); dl.remove();
+        }
+
+        // ADMIN DASHBOARD
         function loadAdminDashboard() {
             db.collection('users').onSnapshot(snapshot => {
                 let html = '';
@@ -354,12 +734,12 @@
                         let hasBadFood = (dData.foods || []).some(f => f.isUnhealthy);
                         
                         let alertClass = hasBadFood ? 'alert' : '';
-                        let warningText = hasBadFood ? '⚠️ <b style="color:var(--danger)">დარღვევა! არაჯანსაღი საკვები</b>' : '✅ კვება წესრიგშია';
+                        let warningText = hasBadFood ? '⚠️ <b style="color:var(--danger)">დარღვევა!</b>' : '✅ წესრიგშია';
 
                         html += `
                             <div class="user-row ${alertClass}">
                                 <b>👤 ${uData.email || 'მომხმარებელი'}</b>
-                                <div class="item-sub">კალორიები: <b>${totalCal}</b> / 2200 კკალ | წყალი: ${dData.water || 0} მლ</div>
+                                <div class="item-sub">კალორიები: <b>${totalCal}</b> კკალ | წყალი: ${dData.water || 0} მლ</div>
                                 <div class="item-sub">${warningText}</div>
                             </div>
                         `;
@@ -369,21 +749,12 @@
             });
         }
 
-        function evaluateDay() {
-            let calEaten = (userData.foods || []).reduce((acc, f) => acc + Number(f.cal), 0);
-            let bad = (userData.foods || []).filter(f => f.isUnhealthy).length;
-            let msg = "";
-            if(calEaten === 0) msg = "ჯერ არაფერი გიჭამია!";
-            else if(bad > 0) msg = "დღეს არაჯანსაღი პროდუქტი ჩაწერე! მწვრთნელის პანელზე უკვე გამოჩნდა დარღვევა.";
-            else msg = "იდეალური დღეა კვების მხრივ! ყოჩაღ დისციპლინისთვის.";
-            document.getElementById('coach-message').innerHTML = msg;
-        }
-
         function switchTab(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tabId).classList.add('active');
             btn.classList.add('active');
+            window.scrollTo(0, 0);
         }
     </script>
 </body>
