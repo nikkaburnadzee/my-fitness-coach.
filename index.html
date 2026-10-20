@@ -1578,6 +1578,41 @@
             draw();
         }
 
+        // Persistent onboarding cache, scoped to the authenticated Firebase UID.
+        function profileCacheKey(uid) { return 'mfc_profile_v2_' + uid; }
+        function cacheProfile(uid, profile) {
+            try { localStorage.setItem(profileCacheKey(uid), JSON.stringify(profile)); }
+            catch (e) { console.warn('Profile cache unavailable', e); }
+        }
+        function readCachedProfile(uid) {
+            try { return JSON.parse(localStorage.getItem(profileCacheKey(uid)) || 'null'); }
+            catch (e) { return null; }
+        }
+        function loadSavedProfile(uid) {
+            var cached = readCachedProfile(uid);
+            if (cached && cached.setupComplete === true) userDocData = Object.assign({}, userDocData, cached);
+            return db.collection('users').doc(uid).get().then(function(doc) {
+                if (doc.exists) {
+                    var cloud = doc.data() || {};
+                    if (cloud.setupComplete === true) {
+                        userDocData = Object.assign({}, userDocData, cloud);
+                        cacheProfile(uid, userDocData);
+                    } else if (cached && cached.setupComplete === true) {
+                        // Recover completed setup if an older client reset the cloud flag.
+                        return db.collection('users').doc(uid).set(cached, { merge: true }).then(function() {
+                            userDocData = Object.assign({}, userDocData, cached);
+                        });
+                    } else {
+                        userDocData = Object.assign({}, userDocData, cloud);
+                    }
+                }
+            }).catch(function(err) {
+                if (!(cached && cached.setupComplete === true)) throw err;
+                console.warn('Using locally saved profile; cloud sync unavailable', err);
+                showNotification('პროფილი ჩაიტვირთა მოწყობილობიდან; ღრუბელთან კავშირი შესამოწმებელია.', true);
+            });
+        }
+
         // FIREBASE AUTH & INIT (WITH SAFE FALLBACK)
         if (auth && db) auth.onAuthStateChanged(function(user) {
             if (user) {
@@ -1606,22 +1641,17 @@
                 var verifyScreen = document.getElementById('verify-screen');
                 if (verifyScreen) verifyScreen.classList.remove('active');
 
-                // Load user data safely
-                db.collection('users').doc(user.uid).get().then(function(doc) {
-                    if (doc.exists) {
-                        userDocData = Object.assign(userDocData, doc.data());
-                    }
-                    if (!userDocData.setupComplete) {
-                        var obScreen = document.getElementById('onboarding-screen');
-                        if (obScreen) obScreen.classList.add('active');
-                    } else {
+                // Restore completed onboarding from Firestore (or this device's cache).
+                loadSavedProfile(user.uid).then(function() {
+                    if (userDocData.setupComplete === true) {
+                        document.getElementById('onboarding-screen').classList.remove('active');
                         initApp();
+                    } else {
+                        document.getElementById('onboarding-screen').classList.add('active');
                     }
                 }).catch(function(e) {
-                    console.log("Fallback init:", e);
                     showNotification('პროფილის ჩატვირთვა ვერ მოხერხდა: ' + e.message, true);
-                document.getElementById('auth-screen').classList.add('active');
-                authStatus('ანგარიშში შესვლა მოხდა, მაგრამ Firestore პროფილის წაკითხვა ვერ მოხერხდა: ' + e.message, true);
+                    authStatus('Firestore პროფილის წაკითხვის შეცდომა: ' + e.message, true);
                 });
             } else {
                 currentUser = null;
@@ -1713,6 +1743,7 @@
                 document.getElementById('verify-screen').classList.remove('active');
                 return db.collection('users').doc(u.uid).get().then(function(doc) {
                     if (doc.exists) userDocData = Object.assign(userDocData, doc.data());
+                    if (userDocData.setupComplete) cacheProfile(u.uid, userDocData);
                     if (!userDocData.setupComplete) document.getElementById('onboarding-screen').classList.add('active');
                     else initApp();
                 });
@@ -1768,6 +1799,7 @@
             };
 
             db.collection('users').doc(currentUser.uid).set(userDocData, { merge: true }).then(function() {
+                cacheProfile(currentUser.uid, userDocData);
                 document.getElementById('onboarding-screen').classList.remove('active');
                 triggerConfetti();
                 initApp();
@@ -1921,7 +1953,7 @@
             userDocData.name = n;
             userDocData.photo = p;
             userDocData.targetWeight = tw;
-            if (currentUser) db.collection('users').doc(currentUser.uid).set({ name: n, photo: p, targetWeight: tw }, { merge: true });
+            if (currentUser) { cacheProfile(currentUser.uid, userDocData); db.collection('users').doc(currentUser.uid).set({ name: n, photo: p, targetWeight: tw }, { merge: true }).catch(function(e){showNotification('პარამეტრები ვერ შეინახა: '+e.message,true);}); }
             closeSettings();
             showNotification("პარამეტრები შენახულია!");
             updateUI();
