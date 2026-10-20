@@ -126,10 +126,30 @@
             </div>
             <h1 style="font-size: 22px; margin-bottom: 6px;">My Fitness Coach</h1>
             <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 24px;">პრემიუმ ფიტნეს პლატფორმა</p>
-            <input type="email" id="auth-email" placeholder="ელ-ფოსტა">
-            <input type="password" id="auth-password" placeholder="პაროლი">
+            <input type="email" id="auth-email" placeholder="ელ-ფოსტა (Gmail)">
+            <input type="password" id="auth-password" placeholder="პაროლი (მინ. 6 სიმბოლო)">
             <button onclick="loginUser()" style="width:100%; margin-top:6px;">შესვლა</button>
             <button class="secondary" onclick="registerUser()" style="width:100%; margin-top:10px;">რეგისტრაცია</button>
+            
+            <div style="margin-top:16px;">
+                <a href="javascript:void(0)" onclick="resetPassword()" style="color:var(--accent); font-size:12px; text-decoration:none; font-weight:600;">დაგავიწყდა პაროლი?</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Verification Guard Screen -->
+    <div id="verify-screen" class="full-screen" style="justify-content: center; align-items: center;">
+        <div class="card" style="width: 100%; max-width: 380px; text-align: center; padding: 32px 24px;">
+            <div style="width:56px; height:56px; background:rgba(245,158,11,0.15); border:1px solid var(--warning); border-radius:16px; display:flex; justify-content:center; align-items:center; margin:0 auto 20px auto;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            </div>
+            <h1 style="font-size: 20px; margin-bottom: 8px;">დაადასტურეთ ელ-ფოსტა</h1>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px; line-height: 1.5;">
+                თქვენს ელ-ფოსტაზე (<b id="unverified-email-text" style="color:var(--text);"></b>) გაგზავნილია ვერიფიკაციის ბმული. სისტემაში შესასვლელად აუცილებელია ბმულზე გადასვლა და მეილის დადასტურება.
+            </p>
+            <button onclick="checkEmailVerified()" style="width:100%; margin-bottom:10px;">დავადასტურე (შემოწმება) 🔄</button>
+            <button class="secondary" onclick="resendVerificationEmail()" style="width:100%; margin-bottom:10px;">ბმულის ხელახლა გაგზავნა ✉️</button>
+            <button class="danger" onclick="logoutUser()" style="width:100%;">გამოსვლა</button>
         </div>
     </div>
 
@@ -545,7 +565,7 @@
             return false;
         };
 
-        // 🛡️ SAFE DOM HELPERS (CRASH-PROOF)
+        // 🛡️ SAFE DOM HELPERS
         function setTxt(id, val) {
             var el = document.getElementById(id);
             if (el) el.innerText = val;
@@ -626,7 +646,7 @@
             measurements: { waist: 0, chest: 0, hips: 0 }
         };
 
-        // 🧠 MASSIVE ADVANCED AI NUTRITION & FITNESS BRAIN
+        // 🧠 MASSIVE ADVANCED AI NUTRITION & FITNESS BRAIN (30+ TOPICS)
         var aiBrain = {
             "კვერცხ": "მოხარშული კვერცხი იდეალური არჩევანია! 1 ცალი შეიცავს ~78 კკალორიას და 6გ უმაღლესი ხარისხის ცილას. საუზმისთვის ან წახემსებისთვის საუკეთესოა.",
             "ქათამ": "ქათმის ფილე (100გ) შეიცავს ~165 კკალორიას და 31გ სუფთა ცილას თითქმის ცხიმის გარეშე. საუკეთესოა კუნთის აღდგენისა და ცხიმის წვისთვის.",
@@ -659,7 +679,6 @@
 
         // 🥗 HUGE FOOD DATABASE (70+ ITEMS)
         var foodDatabase = [
-            // ქართული ტრადიციული
             { name: "ხაჭაპური (იმერული 1 ნაჭერი)", cal: 350, prot: 14, fat: 18, carb: 32, bad: true },
             { name: "ხაჭაპური (აჭარული პატარა)", cal: 650, prot: 24, fat: 28, carb: 75, bad: true },
             { name: "ხაჭაპური (მეგრული 1 ნაჭერი)", cal: 410, prot: 17, fat: 22, carb: 34, bad: true },
@@ -680,8 +699,6 @@
             { name: "ელარჯი (200გ)", cal: 430, prot: 18, fat: 20, carb: 44, bad: true },
             { name: "მჭადი (1 ცალი საშუალო)", cal: 180, prot: 4, fat: 3, carb: 35, bad: false },
             { name: "ჭვიშტარი (1 ცალი)", cal: 260, prot: 8, fat: 12, carb: 30, bad: false },
-
-            // ხორცი, თევზი & კვერცხი
             { name: "ქათმის ფილე მოხარშული (100გ)", cal: 165, prot: 31, fat: 3.6, carb: 0, bad: false },
             { name: "ქათმის ბარძაყი შემწვარი (100გ)", cal: 220, prot: 24, fat: 13, carb: 0, bad: false },
             { name: "ინდაურის ფილე (100გ)", cal: 145, prot: 30, fat: 2, carb: 0, bad: false },
@@ -692,8 +709,6 @@
             { name: "თინუსი (ტუნა) საკუთარ წვენში (100გ)", cal: 116, prot: 26, fat: 1, carb: 0, bad: false },
             { name: "ორაგული შემწვარი (100გ)", cal: 208, prot: 22, fat: 13, carb: 0, bad: false },
             { name: "კალმახი შემწვარი (100გ)", cal: 160, prot: 21, fat: 8, carb: 0, bad: false },
-
-            // რძის პროდუქტები
             { name: "ხაჭო 0% (100გ)", cal: 75, prot: 17, fat: 0.2, carb: 1.8, bad: false },
             { name: "ხაჭო 5% (100გ)", cal: 120, prot: 16, fat: 5, carb: 3, bad: false },
             { name: "ხაჭო 9% (100გ)", cal: 155, prot: 14, fat: 9, carb: 4, bad: false },
@@ -703,8 +718,6 @@
             { name: "იმერული ყველი (50გ)", cal: 130, prot: 9.5, fat: 10, carb: 1, bad: false },
             { name: "ბერძნული იოგურტი (150გ)", cal: 130, prot: 15, fat: 5, carb: 6, bad: false },
             { name: "რძე 2.5% (200მლ)", cal: 104, prot: 6, fat: 5, carb: 9, bad: false },
-
-            // ბურღულეული & ნახშირწყლები
             { name: "მოხარშული წიწიბურა (100გ)", cal: 130, prot: 4.5, fat: 1.1, carb: 26, bad: false },
             { name: "მოხარშული თეთრი ბრინჯი (100გ)", cal: 130, prot: 2.7, fat: 0.3, carb: 28, bad: false },
             { name: "მოხარშული ყავისფერი ბრინჯი (100გ)", cal: 111, prot: 2.6, fat: 0.9, carb: 23, bad: false },
@@ -715,8 +728,6 @@
             { name: "მოხარშული კარტოფილი (100გ)", cal: 87, prot: 2, fat: 0.1, carb: 20, bad: false },
             { name: "თეთრი პური (1 ნაჭერი 30გ)", cal: 75, prot: 2.5, fat: 0.8, carb: 14, bad: false },
             { name: "ჭვავის/ცეხვილი პური (1 ნაჭერი 35გ)", cal: 70, prot: 3, fat: 0.6, carb: 13, bad: false },
-
-            // ხილი & კენკრა
             { name: "ვაშლი (1 ცალი საშუალო)", cal: 80, prot: 0.4, fat: 0.3, carb: 21, bad: false },
             { name: "ბანანი (1 ცალი საშუალო)", cal: 105, prot: 1.3, fat: 0.4, carb: 27, bad: false },
             { name: "ფორთოხალი (1 ცალი)", cal: 65, prot: 1.2, fat: 0.2, carb: 15, bad: false },
@@ -724,8 +735,6 @@
             { name: "მარწყვი (100გ)", cal: 32, prot: 0.7, fat: 0.3, carb: 7.7, bad: false },
             { name: "მოცვი (100გ)", cal: 57, prot: 0.7, fat: 0.3, carb: 14, bad: false },
             { name: "საზამთრო (200გ)", cal: 60, prot: 1.2, fat: 0.3, carb: 15, bad: false },
-
-            // ბოსტნეული & ცხიმები
             { name: "კიტრი (1 ცალი 100გ)", cal: 15, prot: 0.7, fat: 0.1, carb: 3.6, bad: false },
             { name: "პომიდორი (1 ცალი 100გ)", cal: 18, prot: 0.9, fat: 0.2, carb: 3.9, bad: false },
             { name: "კიტრისა და პომიდვრის სალათი ზეთით (200გ)", cal: 140, prot: 2, fat: 10, carb: 8, bad: false },
@@ -733,8 +742,6 @@
             { name: "ნიგოზი (30გ)", cal: 195, prot: 4.5, fat: 20, carb: 4, bad: false },
             { name: "ნუში (30გ)", cal: 175, prot: 6, fat: 15, carb: 6, bad: false },
             { name: "ზეითუნის ზეთი (1 სუფრის კოვზი)", cal: 119, prot: 0, fat: 13.5, carb: 0, bad: false },
-
-            // ფასტფუდი, სნექები & ტკბილეული
             { name: "შაურმა (პატარა)", cal: 650, prot: 28, fat: 25, carb: 75, bad: true },
             { name: "შაურმა (საშუალო/სტანდარტული)", cal: 850, prot: 35, fat: 34, carb: 95, bad: true },
             { name: "პიცა (პეპერონი 1 ნაჭერი)", cal: 290, prot: 12, fat: 13, carb: 30, bad: true },
@@ -819,10 +826,19 @@
             return "Pro Master";
         }
 
-        // AUTH
+        // 🔒 AUTHENTICATION WITH EMAIL VERIFICATION & RESET
         auth.onAuthStateChanged(function(user) {
             if (user) {
                 currentUser = user;
+                
+                // 🛑 STRICT EMAIL VERIFICATION CHECK
+                if (!user.emailVerified) {
+                    showVerifyScreen(user);
+                    return;
+                }
+
+                // Verified User
+                hideVerifyScreen();
                 document.getElementById('auth-screen').classList.remove('active');
                 setVal('history-date', currentDate);
                 
@@ -837,6 +853,8 @@
                     }
                 });
             } else {
+                currentUser = null;
+                hideVerifyScreen();
                 document.getElementById('auth-screen').classList.add('active');
                 var appC = document.getElementById('app-container');
                 if (appC) appC.style.display = 'none';
@@ -847,18 +865,83 @@
             }
         });
 
-        function loginUser() {
-            var em = document.getElementById('auth-email').value;
-            var pw = document.getElementById('auth-password').value;
-            if (!em || !pw) return alert("შეიყვანე Email და პაროლი!");
-            auth.signInWithEmailAndPassword(em, pw).catch(function(e) { alert(e.message); });
+        function showVerifyScreen(user) {
+            document.getElementById('auth-screen').classList.remove('active');
+            var vScr = document.getElementById('verify-screen');
+            if (vScr) vScr.classList.add('active');
+            setTxt('unverified-email-text', user.email);
+            var appC = document.getElementById('app-container');
+            if (appC) appC.style.display = 'none';
+            var aNav = document.getElementById('app-nav');
+            if (aNav) aNav.style.display = 'none';
+            var fab = document.getElementById('fab-ai');
+            if (fab) fab.style.display = 'none';
+        }
+
+        function hideVerifyScreen() {
+            var vScr = document.getElementById('verify-screen');
+            if (vScr) vScr.classList.remove('active');
+        }
+
+        function checkEmailVerified() {
+            if (currentUser) {
+                currentUser.reload().then(function() {
+                    if (currentUser.emailVerified) {
+                        showNotification("✅ ელ-ფოსტა დადასტურებულია!");
+                        hideVerifyScreen();
+                        initApp();
+                    } else {
+                        alert("ელ-ფოსტა ჯერ არ არის დადასტურებული! გთხოვთ შეამოწმოთ თქვენი შემოსული წერილები (და Spam საქაღალდე).");
+                    }
+                });
+            }
+        }
+
+        function resendVerificationEmail() {
+            if (currentUser) {
+                currentUser.sendEmailVerification().then(function() {
+                    alert("ვერიფიკაციის ბმული ხელახლა გაიგზავნა მისამართზე: " + currentUser.email);
+                    showNotification("✉️ ბმული გაიგზავნა!");
+                }).catch(function(e) {
+                    alert("შეცდომა: " + e.message);
+                });
+            }
         }
 
         function registerUser() {
-            var em = document.getElementById('auth-email').value;
+            var em = document.getElementById('auth-email').value.trim();
             var pw = document.getElementById('auth-password').value;
             if (!em || !pw) return alert("შეიყვანე Email და პაროლი!");
-            auth.createUserWithEmailAndPassword(em, pw).catch(function(e) { alert(e.message); });
+            if (pw.length < 6) return alert("პაროლი უნდა შედგებოდეს მინიმუმ 6 სიმბოლოსგან!");
+
+            auth.createUserWithEmailAndPassword(em, pw).then(function(userCred) {
+                userCred.user.sendEmailVerification().then(function() {
+                    alert("რეგისტრაცია წარმატებულია!\nვერიფიკაციის ბმული გაგზავნილია თქვენს ელ-ფოსტაზე: " + em + "\n\nგთხოვთ შეამოწმოთ მეილი და დააჭიროთ ბმულს სისტემაში შესასვლელად.");
+                });
+            }).catch(function(e) {
+                alert("შეცდომა რეგისტრაციისას: " + e.message);
+            });
+        }
+
+        function loginUser() {
+            var em = document.getElementById('auth-email').value.trim();
+            var pw = document.getElementById('auth-password').value;
+            if (!em || !pw) return alert("შეიყვანე Email და პაროლი!");
+            auth.signInWithEmailAndPassword(em, pw).catch(function(e) { alert("შესვლის შეცდომა: " + e.message); });
+        }
+
+        function resetPassword() {
+            var em = document.getElementById('auth-email').value.trim();
+            if (!em) {
+                em = prompt("შეიყვანეთ თქვენი ელ-ფოსტა პაროლის აღსადგენად:");
+            }
+            if (!em) return;
+            auth.sendPasswordResetEmail(em).then(function() {
+                alert("პაროლის აღდგენის ბმული გაგზავნილია თქვენს ელ-ფოსტაზე: " + em);
+                showNotification("✉️ აღდგენის ბმული გაიგზავნა!");
+            }).catch(function(e) {
+                alert("შეცდომა: " + e.message);
+            });
         }
 
         function logoutUser() {
@@ -933,14 +1016,13 @@
 
             addXP(0);
 
-            // 🔒 STRICT ADMIN CHECK - ONLY NIKKABURNADZEE SEES ADMIN PORTAL
+            // 🔒 STRICT PRIVACY CHECK: ONLY ADMIN SEES TAB 6
+            var admNav = document.getElementById('admin-nav-btn');
             if (currentUser && currentUser.email && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-                var admNav = document.getElementById('admin-nav-btn');
                 if (admNav) admNav.style.display = 'flex';
                 loadAdminDashboard();
             } else {
-                var admNavNo = document.getElementById('admin-nav-btn');
-                if (admNavNo) admNavNo.style.display = 'none';
+                if (admNav) admNav.style.display = 'none';
             }
 
             loadDateData();
@@ -950,7 +1032,7 @@
             renderHealthyShopping();
         }
 
-        // 🔒 INDIVIDUAL DATE DATA (Isolated to currentUser.uid)
+        // 🔒 STRICT USER DATA ISOLATION: doc(currentUser.uid)
         function loadDateData() {
             var dateInp = document.getElementById('history-date');
             if (dateInp) currentDate = dateInp.value;
@@ -1498,7 +1580,7 @@
         }
         if (localStorage.getItem('fastingStart')) startFastingLoop();
 
-        // 💬 1-ON-1 DIRECT CHAT (ISOLATED TO CURRENT USER)
+        // 💬 1-ON-1 DIRECT CHAT (ISOLATED TO USER UID)
         function sendMessage() {
             var el = document.getElementById('chat-input');
             var t = el ? escapeHTML(el.value.trim()) : '';
@@ -1636,9 +1718,9 @@
             });
         }
 
-        // 👑 ADMIN PORTAL (ONLY ACCESSED BY nikkaburnadzee@gmail.com)
+        // 👑 ADMIN PORTAL (ONLY FOR nikkaburnadzee@gmail.com)
         function loadAdminDashboard() {
-            if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
+            if (!currentUser || !currentUser.email || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
             
             db.collection('users').onSnapshot(function(snap) {
                 var d = '<option value="">-- აირჩიე მომხმარებელი --</option>';
@@ -1670,7 +1752,7 @@
 
         var admUnsub = null;
         function loadAdminChatWithUser(uid) {
-            if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
+            if (!currentUser || !currentUser.email || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
             selectedAdminUserUid = uid;
             if (!uid) return;
             if (admUnsub) admUnsub();
@@ -1690,7 +1772,7 @@
         }
 
         function sendAdminReply() {
-            if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
+            if (!currentUser || !currentUser.email || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
             var input = document.getElementById('admin-chat-input');
             var t = input ? escapeHTML(input.value) : '';
             if (!t || !selectedAdminUserUid) return;
@@ -1712,7 +1794,7 @@
             a.remove();
         }
 
-        // TABS NAVIGATION (WITH STRICT ADMIN GUARD)
+        // TABS NAVIGATION (STRICT PRIVACY GUARD)
         function switchTab(id, btn) {
             // Strict security guard for Admin Portal
             if (id === 'admin') {
