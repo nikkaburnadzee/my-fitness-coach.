@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Fitness Coach - Ultimate Pro Platform</title>
+    <title>My Fitness Coach - Ultimate Platform</title>
     <!-- Chart.js & Firebase -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -69,8 +69,8 @@
         .pie-value { position: absolute; z-index: 2; font-weight: 800; font-size: 14px; }
         
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .stat-box { background: var(--surface); padding: 16px; border-radius: 20px; border: 1px solid var(--glass-border); display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .stat-val { font-size: 24px; font-weight: 800; color: var(--text); }
+        .stat-box { background: var(--surface); padding: 16px; border-radius: 20px; border: 1px solid var(--glass-border); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .stat-val { font-size: 22px; font-weight: 800; color: var(--text); }
         
         .water-container { height: 110px; background: var(--surface); border-radius: 20px; border: 1px solid var(--glass-border); position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; margin-bottom: 15px; }
         .water-wave { position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%); transition: height 0.8s ease; opacity: 0.8; }
@@ -185,7 +185,7 @@
             <!-- Header & Gamification Bar -->
             <div class="app-header">
                 <div class="profile-section" onclick="openSettings()">
-                    <img src="https://ui-avatars.com/api/?name=User&background=10b981&color=000" id="user-avatar" class="avatar">
+                    <img src="" id="user-avatar" class="avatar">
                     <div class="user-info">
                         <span class="user-name" id="display-name">მომხმარებელი</span>
                         <span class="user-level" id="user-level-badge">Lvl 1 • Beginner</span>
@@ -208,7 +208,7 @@
                 <div class="badge-grid" id="badges-container"></div>
             </div>
 
-            <!-- TAB 1: DIET -->
+            <!-- TAB 1: DIET (კვება) -->
             <div id="tab-diet" class="tab-content active">
                 <div class="flex-row" style="margin-bottom: 12px;">
                     <label style="font-size: 11px; color: var(--text-muted);">თარიღი:</label>
@@ -222,8 +222,13 @@
                             <div class="pie-value" id="cal-percent">0%</div>
                         </div>
                         <div style="flex:1;">
-                            <div style="font-size:26px; font-weight:800; color:var(--primary); line-height:1;"><span id="cal-eaten">0</span><span style="font-size:13px; color:var(--text-muted);"> / <span id="cal-goal">2000</span></span></div>
-                            <div style="font-size:11px; color:var(--text-muted); margin-top:10px; display:flex; justify-content:space-between;">
+                            <div style="font-size:24px; font-weight:800; color:var(--primary); line-height:1;">
+                                <span id="cal-eaten">0</span><span style="font-size:13px; color:var(--text-muted);"> / <span id="cal-goal">2000</span> კკალ</span>
+                            </div>
+                            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
+                                დარჩენილი: <b style="color:var(--text);"><span id="cal-rem">2000</span> კკალ</b>
+                            </div>
+                            <div style="font-size:11px; color:var(--text-muted); margin-top:8px; display:flex; justify-content:space-between;">
                                 <div><div style="color:var(--primary); font-weight:700;">ცილა</div><span id="prot-eaten">0</span> / <span id="prot-goal">120</span>გ</div>
                                 <div><div style="color:var(--accent); font-weight:700;">ცხიმი</div><span id="fat-eaten">0</span> / <span id="fat-goal">60</span>გ</div>
                                 <div><div style="color:var(--warning); font-weight:700;">ნახშ.</div><span id="carb-eaten">0</span> / <span id="carb-goal">150</span>გ</div>
@@ -234,8 +239,8 @@
 
                 <div class="card">
                     <h2>საკვების ბაზა & ძებნა</h2>
-                    <input type="text" id="food-search" placeholder="მოძებნე (მაგ: ხინკალი, ქათამი, ვაშლი)..." oninput="searchFood()">
-                    <div id="food-search-results" style="max-height: 140px; overflow-y: auto; margin-bottom: 6px;"></div>
+                    <input type="text" id="food-search" placeholder="მოძებნე (მაგ: ხინკალი, ქათამი, წიწიბურა)..." oninput="searchFood()">
+                    <div id="food-search-results" style="max-height: 150px; overflow-y: auto; margin-bottom: 6px;"></div>
                 </div>
 
                 <div class="card" style="border-color: rgba(139,92,246,0.3);">
@@ -248,7 +253,10 @@
                 </div>
 
                 <div class="card">
-                    <h2>დღეს ნაჭამი <span id="food-count" style="color:var(--primary); font-size:11px;"></span></h2>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <h2>დღეს ნაჭამი <span id="food-count" style="color:var(--primary); font-size:11px;"></span></h2>
+                        <button class="danger" onclick="clearAllFoods()" style="padding:4px 10px; font-size:10px; width:auto;">ყველას წაშლა 🗑️</button>
+                    </div>
                     <button class="secondary" onclick="copyYesterdayFoods()" style="font-size:11px; margin-bottom:10px; padding:8px;">წინა დღის კოპირება 📋</button>
                     <div id="food-list-breakfast"><h3>საუზმე</h3></div>
                     <div id="food-list-lunch"><h3>სადილი</h3></div>
@@ -257,22 +265,26 @@
                 </div>
             </div>
 
-            <!-- TAB 2: SCHEDULE -->
+            <!-- TAB 2: SCHEDULE (რეჟიმი) -->
             <div id="tab-schedule" class="tab-content">
                 <div class="card">
-                    <h2>სამუშაო გრაფიკი</h2>
+                    <h2>სამუშაო & დღის საათები</h2>
                     <div class="flex-row">
-                        <div><label style="font-size:11px; color:var(--text-muted);">დაწყება</label><input type="time" id="work-start" value="10:00" onchange="generateSchedule()"></div>
-                        <div><label style="font-size:11px; color:var(--text-muted);">დასრულება</label><input type="time" id="work-end" value="19:00" onchange="generateSchedule()"></div>
+                        <div><label style="font-size:11px; color:var(--text-muted);">სამსახურის დაწყება</label><input type="time" id="work-start" value="10:00" onchange="generateSchedule()"></div>
+                        <div><label style="font-size:11px; color:var(--text-muted);">სამსახურის დასრულება</label><input type="time" id="work-end" value="19:00" onchange="generateSchedule()"></div>
+                    </div>
+                    <div class="flex-row" style="margin-top:4px;">
+                        <div><label style="font-size:11px; color:var(--text-muted);">გაღვიძება</label><input type="time" id="wake-time" value="08:00" onchange="generateSchedule()"></div>
+                        <div><label style="font-size:11px; color:var(--text-muted);">დაძინება</label><input type="time" id="sleep-time" value="23:30" onchange="generateSchedule()"></div>
                     </div>
                 </div>
                 <div class="card">
-                    <h2>იდეალური განრიგი</h2>
+                    <h2>შენზე მორგებული იდეალური განრიგი</h2>
                     <div id="schedule-list"></div>
                 </div>
             </div>
 
-            <!-- TAB 3: ACTIVITY -->
+            <!-- TAB 3: ACTIVITY (აქტივობა) -->
             <div id="tab-activity" class="tab-content">
                 <div class="card">
                     <h2>ჰიდრატაცია (წყალი)</h2>
@@ -281,18 +293,26 @@
                         <div class="water-text"><span id="water-val">0</span><span style="font-size:13px; opacity:0.7;"> / <span id="water-goal-display">2500</span>ml</span></div>
                     </div>
                     <div class="flex-row">
+                        <button class="secondary" onclick="addWater(150)">+150 მლ</button>
                         <button class="secondary" onclick="addWater(250)">+250 მლ</button>
                         <button class="secondary" onclick="addWater(500)">+500 მლ</button>
+                    </div>
+                    <div class="flex-row" style="margin-top:10px;">
+                        <input type="number" id="custom-water-input" placeholder="სხვა რაოდენობა (მლ)" style="margin:0;">
+                        <button class="secondary" style="width:auto; padding:0 14px;" onclick="addCustomWater()">+</button>
+                        <button class="danger" style="width:auto; padding:0 14px;" onclick="minusWater(250)">-250</button>
+                        <button class="danger" style="width:auto; padding:0 14px;" onclick="resetWater()">↺</button>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h2>ნაბიჯები</h2>
+                    <h2>ნაბიჯები & სიარული</h2>
                     <div class="progress-bg"><div class="progress-fill" id="step-progress" style="width: 0%;"></div></div>
-                    <div style="text-align:center; margin-bottom:10px; font-weight:800; color:var(--primary);"><span id="step-val">0</span> <span style="font-size:12px; font-weight:400; color:var(--text-muted);">/ 10000</span></div>
+                    <div style="text-align:center; margin-bottom:10px; font-weight:800; color:var(--primary);"><span id="step-val">0</span> <span style="font-size:12px; font-weight:400; color:var(--text-muted);">/ 10000 (~<span id="walk-minutes">0</span> წთ სიარული)</span></div>
                     <div class="flex-row">
-                        <input type="number" id="steps-input" placeholder="რაოდენობა" style="margin:0;">
+                        <input type="number" id="steps-input" placeholder="ნაბიჯების რაოდენობა" style="margin:0;">
                         <button style="width:auto; padding:0 18px;" onclick="addSteps()">დამატება</button>
+                        <button class="danger" style="width:auto; padding:0 14px;" onclick="resetSteps()">↺</button>
                     </div>
                 </div>
 
@@ -313,16 +333,31 @@
                 </div>
 
                 <div class="card">
-                    <h2 id="workout-title">დღის ვარჯიში</h2>
+                    <h2 id="workout-title">დღის ვარჯიში & ტაიმერი</h2>
                     <div id="workout-desc" style="font-size:12px; color:var(--text-muted); margin-bottom:12px; line-height:1.5;"></div>
                     <div style="display:flex; justify-content:space-between; align-items:center; background:var(--surface); padding:14px; border-radius:16px;">
-                        <div style="font-size:22px; font-weight:800; color:var(--warning); font-variant-numeric:tabular-nums;" id="w-time">15:00</div>
-                        <button style="background:var(--warning); color:#000;" id="workout-btn" onclick="startWorkoutTimer()">დაწყება</button>
+                        <div style="font-size:24px; font-weight:800; color:var(--warning); font-variant-numeric:tabular-nums;" id="w-time">15:00</div>
+                        <div style="display:flex; gap:6px;">
+                            <button style="background:var(--warning); color:#000; padding:10px 16px;" id="workout-btn" onclick="toggleWorkoutTimer()">დაწყება</button>
+                            <button class="secondary" style="padding:10px 14px;" onclick="resetWorkoutTimer()">↺</button>
+                        </div>
                     </div>
+                </div>
+
+                <div class="card">
+                    <h2>ვარჯიშის ჟურნალი (ლოგი)</h2>
+                    <div class="flex-row">
+                        <input type="text" id="wo-name" placeholder="ვარჯიში (მაგ: აზიდვა)" style="margin:0; flex:2;">
+                        <input type="number" id="wo-sets" placeholder="სეტი" style="margin:0; flex:1;">
+                        <input type="number" id="wo-reps" placeholder="გამეორ." style="margin:0; flex:1;">
+                        <input type="number" id="wo-weight" placeholder="კგ" style="margin:0; flex:1;">
+                    </div>
+                    <button class="secondary" style="width:100%; margin-top:10px;" onclick="addWorkoutLog()">ვარჯიშის ჩაწერა</button>
+                    <div id="workout-log-list" style="margin-top:10px;"></div>
                 </div>
             </div>
 
-            <!-- TAB 4: CHAT & PROGRESS -->
+            <!-- TAB 4: CHAT & PROGRESS (ჩატი & პროგრესი) -->
             <div id="tab-chat" class="tab-content">
                 <div class="card" style="border-color: rgba(139,92,246,0.3);">
                     <h2>პირდაპირი ჩატი მწვრთნელთან</h2>
@@ -334,19 +369,44 @@
                 </div>
 
                 <div class="card">
-                    <h2>წონის კონტროლი</h2>
-                    <div class="flex-row" style="margin-bottom:12px;">
+                    <h2>წონა & სხეულის გარშემოწერილობა</h2>
+                    <div class="flex-row" style="margin-bottom:8px;">
                         <input type="number" id="weight-input" placeholder="დღევანდელი წონა (კგ)" step="0.1" style="margin:0;">
                         <button style="width:auto; padding:0 18px;" onclick="addWeight()">შენახვა</button>
                     </div>
+                    <div class="flex-row" style="margin-bottom:12px;">
+                        <input type="number" id="measure-waist" placeholder="წელი (სმ)" style="margin:0;">
+                        <input type="number" id="measure-chest" placeholder="მკერდი (სმ)" style="margin:0;">
+                        <input type="number" id="measure-hips" placeholder="ბარძაყი (სმ)" style="margin:0;">
+                        <button class="secondary" style="width:auto; padding:0 12px;" onclick="saveMeasurements()">💾</button>
+                    </div>
+
+                    <div class="stat-grid" style="margin-bottom:12px;">
+                        <div class="stat-box">
+                            <div class="stat-val" style="color:var(--primary)" id="weekly-avg-weight">--</div>
+                            <div style="font-size:11px; color:var(--text-muted);">კვირის საშუალო</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-val" style="color:var(--accent)" id="remaining-weight-kg">--</div>
+                            <div style="font-size:11px; color:var(--text-muted);">დარჩენილი მიზნამდე</div>
+                        </div>
+                    </div>
                     <canvas id="weightChart" width="100" height="60"></canvas>
+                </div>
+
+                <div class="card">
+                    <h2>კვირის რეპორტი</h2>
+                    <div style="text-align:center; padding:10px;">
+                        <div id="weekly-report-text" style="font-size:12px; color:var(--text-muted); margin-bottom:12px; line-height:1.5;">მონაცემები გენერირდება...</div>
+                        <button class="secondary" style="width:100%;" onclick="shareReport()">📤 რეპორტის გაზიარება</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- TAB 5: BUDGET -->
+            <!-- TAB 5: BUDGET (ბიუჯეტი) -->
             <div id="tab-budget" class="tab-content">
                 <div class="card">
-                    <h2>თვის ბიუჯეტი</h2>
+                    <h2>თვის ბიუჯეტი: <span id="display-budget-total" style="color:var(--primary)">250</span> ₾</h2>
                     <div class="flex-row" style="margin-bottom:12px;">
                         <input type="number" id="budget-limit-input" placeholder="ლიმიტი (₾)" style="margin:0;">
                         <button style="width:auto; padding:0 14px;" onclick="updateBudgetLimit()">✎ შეცვლა</button>
@@ -371,12 +431,22 @@
                     </div>
                     <button style="width:100%; margin-top:10px;" onclick="addExpense()">ჩაწერა</button>
                 </div>
+
+                <div class="card">
+                    <h2>ხარჯების ისტორია</h2>
+                    <div id="expense-list"></div>
+                </div>
+
+                <div class="card">
+                    <h2>ჯანსაღი საყიდლების სია (1-Click)</h2>
+                    <div id="healthy-shopping-list"></div>
+                </div>
             </div>
 
-            <!-- TAB 6: ADMIN PORTAL -->
+            <!-- TAB 6: ADMIN PORTAL (მხოლოდ nikkaburnadzee@gmail.com) -->
             <div id="tab-admin" class="tab-content">
                 <div class="card" style="border: 1px solid var(--primary); background: rgba(16,185,129,0.05);">
-                    <h2 style="color:var(--primary);">👑 ადმინ პორტალი</h2>
+                    <h2 style="color:var(--primary);">👑 ადმინ პორტალი (nikkaburnadzee@gmail.com)</h2>
                     <select id="admin-user-dropdown" onchange="loadAdminChatWithUser(this.value)"></select>
                     <div class="chat-container" id="admin-chat-box" style="background:var(--bg); border:1px solid var(--glass-border); padding:10px; border-radius:16px;"></div>
                     <div class="flex-row">
@@ -386,8 +456,13 @@
                 </div>
 
                 <div class="card">
-                    <h2>კლიენტების მონიტორინგი</h2>
+                    <h2>კლიენტების რეალურ დროში მონიტორინგი</h2>
                     <div id="admin-user-list"></div>
+                </div>
+
+                <div class="card">
+                    <h2>მონაცემების Backup (JSON)</h2>
+                    <button class="secondary" style="width:100%;" onclick="backupClientData()">📥 ბაზის გადმოწერა</button>
                 </div>
             </div>
         </div>
@@ -401,12 +476,12 @@
     <!-- AI Bot Modal -->
     <div class="modal" id="ai-modal">
         <div class="modal-content">
-            <h2 style="color:var(--accent);">🤖 AI ასისტენტი <span style="cursor:pointer;" onclick="toggleAiModal()">✕</span></h2>
-            <div class="chat-container" id="ai-chat-box" style="height:240px; background:var(--surface); padding:12px; border-radius:16px;">
-                <div class="msg-bubble coach">გამარჯობა! მე ვარ შენი ფიტნეს AI. მკითხე ნებისმიერი რამ კალორიებზე, ცილებზე, ვარჯიშებზე ან წონის კლებაზე!</div>
+            <h2 style="color:var(--accent);">🤖 AI ასისტენტი (Gemini Brain) <span style="cursor:pointer;" onclick="toggleAiModal()">✕</span></h2>
+            <div class="chat-container" id="ai-chat-box" style="height:250px; background:var(--surface); padding:12px; border-radius:16px;">
+                <div class="msg-bubble coach">გამარჯობა! მე ვარ შენი AI ასისტენტი. მკითხე ნებისმიერ საკვებზე, კალორიებზე, ცილებზე, ვარჯიშებზე ან წონის კლებაზე!</div>
             </div>
             <div class="flex-row">
-                <input type="text" id="ai-input" placeholder="დასვი კითხვა..." style="margin:0;" onkeypress="if(event.key==='Enter') askAi()">
+                <input type="text" id="ai-input" placeholder="მაგ: კვერცხი ვჭამე, რამდენი წყალი დავლიო?..." style="margin:0;" onkeypress="if(event.key==='Enter') askAi()">
                 <button class="accent" style="width:auto; padding:0 16px;" onclick="askAi()">></button>
             </div>
         </div>
@@ -420,6 +495,8 @@
             <input type="text" id="set-name">
             <label style="font-size:11px; color:var(--text-muted);">პროფილის ფოტო (URL)</label>
             <input type="text" id="set-photo" placeholder="https://...">
+            <label style="font-size:11px; color:var(--text-muted);">სამიზნე წონა (კგ)</label>
+            <input type="number" id="set-target-weight" placeholder="მაგ: 70">
             <label style="font-size:11px; color:var(--text-muted);">ახალი პაროლი</label>
             <input type="password" id="set-password" placeholder="******">
             <button onclick="saveSettings()" style="width:100%; margin-top:10px;">შენახვა</button>
@@ -456,6 +533,32 @@
     </div>
 
     <script>
+        // 🛡️ ON-SCREEN ERROR DETECTOR
+        window.onerror = function(msg, url, lineNo) {
+            var notif = document.getElementById('notification');
+            if (notif) {
+                notif.innerText = "JS ხარვეზი: " + msg + " (" + lineNo + ")";
+                notif.className = 'danger';
+                notif.style.opacity = '1';
+                setTimeout(function() { notif.style.opacity = '0'; }, 5000);
+            }
+            return false;
+        };
+
+        // 🛡️ SAFE DOM HELPERS (CRASH-PROOF)
+        function setTxt(id, val) {
+            var el = document.getElementById(id);
+            if (el) el.innerText = val;
+        }
+        function setHtml(id, val) {
+            var el = document.getElementById(id);
+            if (el) el.innerHTML = val;
+        }
+        function setVal(id, val) {
+            var el = document.getElementById(id);
+            if (el) el.value = val;
+        }
+
         function escapeHTML(str) {
             if (!str) return '';
             return String(str).replace(/[&<>'"]/g, function(tag) {
@@ -464,7 +567,7 @@
             });
         }
 
-        // 🔒 CONFIG
+        // 🔒 ADMIN SPECIFICATION
         var ADMIN_EMAIL = "nikkaburnadzee@gmail.com";
         var firebaseConfig = {
             apiKey: "AIzaSyCjFhlvbcKuXNweVxSVexmNw_3hSp5gGK8",
@@ -481,36 +584,176 @@
 
         var currentUser = null;
         var selectedAdminUserUid = null;
-        var currentDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Tbilisi' });
+
+        // 🇬🇪 PURE MATH UTC+4
+        function getTbilisiDate() {
+            var now = new Date();
+            var utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            var tbDate = new Date(utc + (3600000 * 4));
+            var y = tbDate.getFullYear();
+            var m = String(tbDate.getMonth() + 1);
+            if (m.length < 2) m = '0' + m;
+            var d = String(tbDate.getDate());
+            if (d.length < 2) d = '0' + d;
+            return y + '-' + m + '-' + d;
+        }
+
+        var currentDate = getTbilisiDate();
         var currentMonth = currentDate.slice(0, 7);
 
-        var userDocData = { name: "მომხმარებელი", photo: "https://ui-avatars.com/api/?name=U&background=10b981&color=000", goalCal: 2000, goalProt: 120, goalFat: 60, goalCarb: 150, gym: false, setupComplete: false, waterGoal: 2500, xp: 0, streak: 1 };
-        var userData = { foods: [], water: 0, steps: 0, weights: [{date: currentDate, weight: 70}], expenses: [], habits: {} };
-
-        // 🧠 ADVANCED AI BRAIN KNOWLEDGE
-        var aiBrain = {
-            "კალორი": "კალორიული დეფიციტი არის წონის კლების საფუძველი. თუ შენი ნორმაა 2000 კკალ, 1500-1600 კკალ-ის მიღებით კვირაში ~0.5კგ ცხიმს დაიკლებ.",
-            "ცილ": "ცილა აუცილებელია კუნთოვანი მასის შენარჩუნებისთვის. რეკომენდებული ნორმაა 1.6 - 2.2 გრამი შენი სხეულის თითოეულ კილოგრამზე.",
-            "წყალ": "წყალი მეტაბოლიზმისთვის უმნიშვნელოვანესია. დღიური ნორმა 2.5-3 ლიტრია. ყავა და ჩაი წყალს ვერ ჩაანაცვლებს.",
-            "მუცელ": "მუცლიდან ცხიმის ლოკალური წვა შეუძლებელია. ცხიმი დნება მთელს სხეულზე თანაბრად, როცა ხარ დეფიციტში.",
-            "ხინკალ": "1 ცალი ხინკალი შეიცავს საშუალოდ 60-70 კალორიას. 5 ცალი ხინკალი ~320 კკალ-ია. მისი ჭამა შეიძლება, თუ ეტევი დღიურ ნორმაში!",
-            "ხაჭაპურ": "1 ნაჭერი იმერული ხაჭაპური ~350-400 კალორიაა. მაღალი ცხიმიანობის გამო მიიღე ზომიერად.",
-            "შვრია": "შვრია რთული ნახშირწყალია, რომელიც დიდხანს განაყრებს. 100გ მშრალი შვრია შეიცავს ~380 კკალ-ს და 13გ ცილას.",
-            "ძილ": "7-8 საათიანი ხარისხიანი ძილი აქვეითებს კორტიზოლს (სტრესის ჰორმონს) და ხელს უწყობს ცხიმის წვას.",
-            "ვარჯიშ": "წონის კლებისთვის 80% კვებაა და 20% ვარჯიში. ვარჯიში გეხმარება კუნთის შენარჩუნებასა და სხეულის გამკვრივებაში."
+        var userDocData = { 
+            name: "მომხმარებელი", 
+            photo: "https://ui-avatars.com/api/?name=U&background=10b981&color=000", 
+            goalCal: 2000, 
+            goalProt: 120, 
+            goalFat: 60, 
+            goalCarb: 150, 
+            gym: false, 
+            setupComplete: false, 
+            waterGoal: 2500, 
+            targetWeight: 70,
+            xp: 0, 
+            streak: 1 
+        };
+        var userData = { 
+            foods: [], 
+            water: 0, 
+            steps: 0, 
+            weights: [{date: currentDate, weight: 70}], 
+            expenses: [], 
+            habits: {},
+            workouts: [],
+            measurements: { waist: 0, chest: 0, hips: 0 }
         };
 
+        // 🧠 MASSIVE ADVANCED AI NUTRITION & FITNESS BRAIN
+        var aiBrain = {
+            "კვერცხ": "მოხარშული კვერცხი იდეალური არჩევანია! 1 ცალი შეიცავს ~78 კკალორიას და 6გ უმაღლესი ხარისხის ცილას. საუზმისთვის ან წახემსებისთვის საუკეთესოა.",
+            "ქათამ": "ქათმის ფილე (100გ) შეიცავს ~165 კკალორიას და 31გ სუფთა ცილას თითქმის ცხიმის გარეშე. საუკეთესოა კუნთის აღდგენისა და ცხიმის წვისთვის.",
+            "ფილე": "ქათმის ფილე (100გ) შეიცავს ~165 კკალორიას და 31გ სუფთა ცილას თითქმის ცხიმის გარეშე. საუკეთესოა კუნთის აღდგენისა და ცხიმის წვისთვის.",
+            "წიწიბურ": "მოხარშული წიწიბურა (100გ) ~130 კკალორიაა. ის რთული ნახშირწყალია, რომელიც სისხლში შაქრის დონეს სტაბილურად ინარჩუნებს და დიდხანს განაყრებს.",
+            "ხინკალ": "1 ცალი ქალაქური ხინკალი ~65-70 კალორიაა. 5 ცალი ხინკალი გამოდის ~340 კკალ. მისი მირთმევა დასაშვებია, თუ ჯდებით თქვენს დღიურ კალორიულ ლიმიტში!",
+            "ხაჭაპურ": "1 ნაჭერი იმერული ხაჭაპური ~350-400 კალორიაა და შეიცავს ბევრ ცხიმს. მიირთვით ზომიერად და დღის პირველ ნახევარში.",
+            "მაწონ": "1 ჭიქა მაწონი (200გ) ~120 კკალ და 7გ ცილაა. შეიცავს პრობიოტიკებს, აუმჯობესებს მონელებას და იდეალურია საღამოს კვებისთვის.",
+            "სულგუნ": "50გ სულგუნი ~145 კკალ და 11გ ცილაა. კარგი ცილოვანი წახემსებაა, თუმცა შეიცავს მარილსა და ცხიმს, ამიტომ დაიცავით ზომიერება.",
+            "ვაშლ": "1 საშუალო ვაშლი შეიცავს ~80 კკალორიას და მდიდარია ბოჭკოთი (ფაიბერით), რაც შიმშილის გრძნობას აქრობს.",
+            "ბანან": "1 საშუალო ბანანი ~105 კკალორიაა. შესანიშნავი ენერგიის წყაროა უშუალოდ ვარჯიშის წინ ან ვარჯიშის დასრულებისთანავე.",
+            "შაურმ": "სტანდარტული შაურმა საკმაოდ კალორიულია (~650-800 კკალ) სოუსების გამო. თუ მიირთმევთ, დღის დარჩენილი კვება შეამსუბუქეთ!",
+            "კალორი": "წონის კლების ერთადერთი სამეცნიერო გარანტია კალორიული დეფიციტია. დღიური ნორმიდან 400-500 კკალ-ის დაკლებით კვირაში ჯანსაღად დაიკლებთ ~0.5კგ ცხიმს.",
+            "ცილ": "ცილა (პროტეინი) იცავს კუნთს დაშლისგან და აჩქარებს მეტაბოლიზმს. დღიური ნორმაა 1.6 - 2.0 გრამი სხეულის წონის თითოეულ კილოგრამზე.",
+            "წყალ": "ჰიდრატაცია აუცილებელია ცხიმის წვის პროცესისთვის. რეკომენდებულია 2.5-3 ლიტრი წყალი დღეში. ყავა და ჩაი წყალს ვერ ანაცვლებს.",
+            "მუცელ": "მუცლის ცხიმის ლოკალური წვა შეუძლებელია. პრესის ვარჯიშები ამაგრებს კუნთს, ხოლო ცხიმი დნება მთელს სხეულზე კალორიული დეფიციტით.",
+            "ძილ": "7-8 საათიანი ხარისხიანი ძილი აქვეითებს კორტიზოლს (სტრესის ჰორმონს) და არეგულირებს მადას. უძილობა იწვევს ტკბილეულის მოთხოვნილებას.",
+            "ვარჯიშ": "წონის კლებაში 80% კვებაა და 20% ვარჯიში. ვარჯიში აუცილებელია, რომ სხეული იყოს მკვრივი, ტონუსში და არ დაკარგოთ კუნთოვანი მასა.",
+            "შვრია": "შვრია საუკეთესო საუზმეა: 100გ მშრალი შვრია შეიცავს ~370 კკალ-ს, 13გ ცილას და მდიდარია ბეტა-გლუკანით, რაც ქოლესტერინს ამცირებს.",
+            "პურ": "1 ნაჭერი თეთრი პური ~75 კკალ-ია. უმჯობესია გამოიყენოთ ცეხვილი, ჭვავის ან მთლიანი მარცვლის პური ხანგრძლივი დანაყრებისთვის.",
+            "ყავ": "უშაქრო შავი ყავა თითქმის 0 კალორიაა და შეიცავს კოფეინს, რაც მეტაბოლიზმს 3-11%-ით აჩქარებს. მოერიდეთ ნაღებსა და შაქარს.",
+            "კრეატინ": "კრეატინის მონოჰიდრატი ზრდის კუნთის ძალასა და გამძლეობას. მიიღეთ 5გ ყოველდღე საკმარის წყალთან ერთად.",
+            "პროტეინ": "პროტეინის ფხვნილი (Whey) არის ჩვეულებრივი რძის შრატის ცილა, რომელიც მოსახერხებელია დღიური ცილის ნორმის შესავსებად.",
+            "კარდიო": "კარდიო (სიარული, სირბილი) წვავს კალორიებს და აუმჯობესებს გულ-სისხლძარღვთა სისტემას. დღეში 10,000 ნაბიჯი იდეალურია.",
+            "ლობიან": "1 ნაჭერი ლობიანი ~300-340 კკალ-ია. მცენარეული ცილისა და ბოჭკოს კარგი წყაროა, თუმცა შეიცავს ცხიმსაც.",
+            "თევზ": "თევზი (განსაკუთრებით ორაგული და კალმახი) მდიდარია ომეგა 3 ცხიმოვანი მჟავებით, რაც ამცირებს ანთებას და გულს იცავს.",
+            "ტუნა": "ტუნა (თინუსი) თითქმის 100% ცილაა. 100გ შეიცავს ~130 კკალ-ს და 28გ ცილას.",
+            "ხაჭო": "ხაჭო (განსაკუთრებით 5%) შეიცავს ნელა ასათვისებელ კაზეინის ცილას. საუკეთესოა საღამოს კვებისთვის, რათა ღამით კუნთი იკვებებოდეს."
+        };
+
+        // 🥗 HUGE FOOD DATABASE (70+ ITEMS)
         var foodDatabase = [
+            // ქართული ტრადიციული
             { name: "ხაჭაპური (იმერული 1 ნაჭერი)", cal: 350, prot: 14, fat: 18, carb: 32, bad: true },
-            { name: "ხინკალი (1 ცალი)", cal: 65, prot: 3, fat: 3, carb: 8, bad: true },
-            { name: "მოხარშული კვერცხი (1 ცალი)", cal: 78, prot: 6, fat: 5, carb: 0, bad: false },
-            { name: "ქათმის ფილე (100გ)", cal: 165, prot: 31, fat: 3, carb: 0, bad: false },
-            { name: "მოხარშული წიწიბურა (100გ)", cal: 130, prot: 5, fat: 1, carb: 25, bad: false },
+            { name: "ხაჭაპური (აჭარული პატარა)", cal: 650, prot: 24, fat: 28, carb: 75, bad: true },
+            { name: "ხაჭაპური (მეგრული 1 ნაჭერი)", cal: 410, prot: 17, fat: 22, carb: 34, bad: true },
+            { name: "ხინკალი (ქალაქური 1 ცალი)", cal: 68, prot: 3.5, fat: 3.2, carb: 8, bad: true },
+            { name: "ხინკალი (მთიულური 1 ცალი)", cal: 65, prot: 3.8, fat: 2.8, carb: 7.5, bad: true },
+            { name: "ლობიანი (1 ნაჭერი)", cal: 320, prot: 10, fat: 11, carb: 45, bad: false },
+            { name: "კუბდარი (1 ნაჭერი)", cal: 380, prot: 16, fat: 19, carb: 35, bad: true },
+            { name: "ლობიო ქოთნის (250გ)", cal: 240, prot: 15, fat: 5, carb: 35, bad: false },
+            { name: "მწვადი ღორის (150გ)", cal: 390, prot: 28, fat: 30, carb: 0, bad: true },
+            { name: "მწვადი ქათმის (150გ)", cal: 245, prot: 36, fat: 10, carb: 0, bad: false },
+            { name: "ჩახოხბილი (200გ)", cal: 230, prot: 26, fat: 11, carb: 6, bad: false },
+            { name: "ჩიხირთმა (300მლ)", cal: 210, prot: 18, fat: 12, carb: 4, bad: false },
+            { name: "საცივი (150გ)", cal: 420, prot: 24, fat: 35, carb: 6, bad: true },
+            { name: "შქმერული (200გ)", cal: 450, prot: 32, fat: 34, carb: 3, bad: true },
+            { name: "ფხალი ისპანახის (100გ)", cal: 160, prot: 5, fat: 12, carb: 8, bad: false },
+            { name: "ფხალი ჭარხლის (100გ)", cal: 145, prot: 4, fat: 11, carb: 9, bad: false },
+            { name: "ბადრიჯანი ნიგვზით (2 ცალი)", cal: 220, prot: 6, fat: 18, carb: 9, bad: false },
+            { name: "ელარჯი (200გ)", cal: 430, prot: 18, fat: 20, carb: 44, bad: true },
+            { name: "მჭადი (1 ცალი საშუალო)", cal: 180, prot: 4, fat: 3, carb: 35, bad: false },
+            { name: "ჭვიშტარი (1 ცალი)", cal: 260, prot: 8, fat: 12, carb: 30, bad: false },
+
+            // ხორცი, თევზი & კვერცხი
+            { name: "ქათმის ფილე მოხარშული (100გ)", cal: 165, prot: 31, fat: 3.6, carb: 0, bad: false },
+            { name: "ქათმის ბარძაყი შემწვარი (100გ)", cal: 220, prot: 24, fat: 13, carb: 0, bad: false },
+            { name: "ინდაურის ფილე (100გ)", cal: 145, prot: 30, fat: 2, carb: 0, bad: false },
+            { name: "საქონლის მჭლე ხორცი მოხარშული (100გ)", cal: 215, prot: 26, fat: 12, carb: 0, bad: false },
+            { name: "მოხარშული კვერცხი (1 ცალი)", cal: 78, prot: 6.3, fat: 5.3, carb: 0.6, bad: false },
+            { name: "კვერცხის ცილა (1 ცალი)", cal: 17, prot: 3.6, fat: 0.1, carb: 0.2, bad: false },
+            { name: "ერბოკვერცხი (2 კვერცხი ზეთში)", cal: 210, prot: 13, fat: 17, carb: 1, bad: false },
+            { name: "თინუსი (ტუნა) საკუთარ წვენში (100გ)", cal: 116, prot: 26, fat: 1, carb: 0, bad: false },
+            { name: "ორაგული შემწვარი (100გ)", cal: 208, prot: 22, fat: 13, carb: 0, bad: false },
+            { name: "კალმახი შემწვარი (100გ)", cal: 160, prot: 21, fat: 8, carb: 0, bad: false },
+
+            // რძის პროდუქტები
+            { name: "ხაჭო 0% (100გ)", cal: 75, prot: 17, fat: 0.2, carb: 1.8, bad: false },
+            { name: "ხაჭო 5% (100გ)", cal: 120, prot: 16, fat: 5, carb: 3, bad: false },
+            { name: "ხაჭო 9% (100გ)", cal: 155, prot: 14, fat: 9, carb: 4, bad: false },
             { name: "მაწონი (1 ჭიქა 200გ)", cal: 120, prot: 7, fat: 6, carb: 9, bad: false },
+            { name: "კეფირი 1% (200მლ)", cal: 80, prot: 6, fat: 2, carb: 8, bad: false },
             { name: "სულგუნი (50გ)", cal: 145, prot: 11, fat: 11, carb: 0, bad: false },
-            { name: "ვაშლი (1 ცალი)", cal: 80, prot: 0, fat: 0, carb: 20, bad: false },
-            { name: "ბანანი (1 ცალი)", cal: 105, prot: 1, fat: 0, carb: 27, bad: false },
-            { name: "შაურმა (პატარა)", cal: 650, prot: 28, fat: 25, carb: 75, bad: true }
+            { name: "იმერული ყველი (50გ)", cal: 130, prot: 9.5, fat: 10, carb: 1, bad: false },
+            { name: "ბერძნული იოგურტი (150გ)", cal: 130, prot: 15, fat: 5, carb: 6, bad: false },
+            { name: "რძე 2.5% (200მლ)", cal: 104, prot: 6, fat: 5, carb: 9, bad: false },
+
+            // ბურღულეული & ნახშირწყლები
+            { name: "მოხარშული წიწიბურა (100გ)", cal: 130, prot: 4.5, fat: 1.1, carb: 26, bad: false },
+            { name: "მოხარშული თეთრი ბრინჯი (100გ)", cal: 130, prot: 2.7, fat: 0.3, carb: 28, bad: false },
+            { name: "მოხარშული ყავისფერი ბრინჯი (100გ)", cal: 111, prot: 2.6, fat: 0.9, carb: 23, bad: false },
+            { name: "შვრიის ფაფა წყალზე (200გ)", cal: 140, prot: 5, fat: 2.5, carb: 25, bad: false },
+            { name: "მოხარშული მაკარონი (100გ)", cal: 140, prot: 5, fat: 0.8, carb: 28, bad: false },
+            { name: "მოხარშული ოსპი (100გ)", cal: 116, prot: 9, fat: 0.4, carb: 20, bad: false },
+            { name: "ბულგური მოხარშული (100გ)", cal: 110, prot: 3.5, fat: 0.3, carb: 23, bad: false },
+            { name: "მოხარშული კარტოფილი (100გ)", cal: 87, prot: 2, fat: 0.1, carb: 20, bad: false },
+            { name: "თეთრი პური (1 ნაჭერი 30გ)", cal: 75, prot: 2.5, fat: 0.8, carb: 14, bad: false },
+            { name: "ჭვავის/ცეხვილი პური (1 ნაჭერი 35გ)", cal: 70, prot: 3, fat: 0.6, carb: 13, bad: false },
+
+            // ხილი & კენკრა
+            { name: "ვაშლი (1 ცალი საშუალო)", cal: 80, prot: 0.4, fat: 0.3, carb: 21, bad: false },
+            { name: "ბანანი (1 ცალი საშუალო)", cal: 105, prot: 1.3, fat: 0.4, carb: 27, bad: false },
+            { name: "ფორთოხალი (1 ცალი)", cal: 65, prot: 1.2, fat: 0.2, carb: 15, bad: false },
+            { name: "კივი (1 ცალი)", cal: 42, prot: 0.8, fat: 0.4, carb: 10, bad: false },
+            { name: "მარწყვი (100გ)", cal: 32, prot: 0.7, fat: 0.3, carb: 7.7, bad: false },
+            { name: "მოცვი (100გ)", cal: 57, prot: 0.7, fat: 0.3, carb: 14, bad: false },
+            { name: "საზამთრო (200გ)", cal: 60, prot: 1.2, fat: 0.3, carb: 15, bad: false },
+
+            // ბოსტნეული & ცხიმები
+            { name: "კიტრი (1 ცალი 100გ)", cal: 15, prot: 0.7, fat: 0.1, carb: 3.6, bad: false },
+            { name: "პომიდორი (1 ცალი 100გ)", cal: 18, prot: 0.9, fat: 0.2, carb: 3.9, bad: false },
+            { name: "კიტრისა და პომიდვრის სალათი ზეთით (200გ)", cal: 140, prot: 2, fat: 10, carb: 8, bad: false },
+            { name: "ავოკადო (ნახევარი ~70გ)", cal: 115, prot: 1.4, fat: 10.5, carb: 6, bad: false },
+            { name: "ნიგოზი (30გ)", cal: 195, prot: 4.5, fat: 20, carb: 4, bad: false },
+            { name: "ნუში (30გ)", cal: 175, prot: 6, fat: 15, carb: 6, bad: false },
+            { name: "ზეითუნის ზეთი (1 სუფრის კოვზი)", cal: 119, prot: 0, fat: 13.5, carb: 0, bad: false },
+
+            // ფასტფუდი, სნექები & ტკბილეული
+            { name: "შაურმა (პატარა)", cal: 650, prot: 28, fat: 25, carb: 75, bad: true },
+            { name: "შაურმა (საშუალო/სტანდარტული)", cal: 850, prot: 35, fat: 34, carb: 95, bad: true },
+            { name: "პიცა (პეპერონი 1 ნაჭერი)", cal: 290, prot: 12, fat: 13, carb: 30, bad: true },
+            { name: "ჩიზბურგერი (სტანდარტული)", cal: 310, prot: 16, fat: 14, carb: 32, bad: true },
+            { name: "კარტოფილი ფრი (საშუალო 110გ)", cal: 340, prot: 4, fat: 17, carb: 44, bad: true },
+            { name: "ჩიფსი (პატარა შეკვრა 40გ)", cal: 215, prot: 2.5, fat: 14, carb: 20, bad: true },
+            { name: "შოკოლადი შავი 70% (25გ)", cal: 145, prot: 2, fat: 10, carb: 11, bad: false },
+            { name: "შოკოლადი რძიანი (25გ)", cal: 135, prot: 1.8, fat: 7.5, carb: 15, bad: true },
+            { name: "ჩურჩხელა (1 ცალი საშუალო)", cal: 360, prot: 6, fat: 15, carb: 52, bad: false },
+            { name: "კოკა-კოლა (0.5 ლ)", cal: 210, prot: 0, fat: 0, carb: 53, bad: true }
+        ];
+
+        var healthyShoppingList = [
+            { name: "კვერცხი (30 ცალი)", price: 15 },
+            { name: "ქათმის ფილე (1 კგ)", price: 13 },
+            { name: "ხაჭო 5% (500გ)", price: 6.5 },
+            { name: "შვრია (1 კგ)", price: 4.5 },
+            { name: "წიწიბურა (1 კგ)", price: 5 },
+            { name: "სეზონური ბოსტნეული", price: 12 }
         ];
 
         function showNotification(msg, isDanger) {
@@ -522,7 +765,7 @@
             setTimeout(function() { el.style.opacity = '0'; }, 2500);
         }
 
-        // CONFETTI ANIMATION (PURE JAVASCRIPT, 100% COMPATIBLE)
+        // CONFETTI
         function triggerConfetti() {
             var canvas = document.getElementById('confetti-canvas');
             if (!canvas) return;
@@ -530,7 +773,7 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             var pieces = [];
-            for (var i = 0; i < 50; i++) {
+            for (var i = 0; i < 45; i++) {
                 pieces.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height - canvas.height,
@@ -549,23 +792,20 @@
                     p.y += p.speed;
                 }
                 frame++;
-                if (frame < 60) {
-                    requestAnimationFrame(draw);
-                } else {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                }
+                if (frame < 55) { requestAnimationFrame(draw); } 
+                else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
             }
             draw();
         }
 
-        // GAMIFICATION & XP
         function addXP(amount) {
             userDocData.xp = (userDocData.xp || 0) + amount;
             var level = Math.floor(userDocData.xp / 100) + 1;
             var currentXp = userDocData.xp % 100;
             
-            document.getElementById('user-level-badge').innerText = 'Lvl ' + level + ' • ' + getLevelName(level);
-            document.getElementById('xp-fill').style.width = currentXp + '%';
+            setTxt('user-level-badge', 'Lvl ' + level + ' • ' + getLevelName(level));
+            var fillEl = document.getElementById('xp-fill');
+            if (fillEl) fillEl.style.width = currentXp + '%';
             
             if (currentUser) {
                 db.collection('users').doc(currentUser.uid).update({ xp: userDocData.xp });
@@ -584,7 +824,7 @@
             if (user) {
                 currentUser = user;
                 document.getElementById('auth-screen').classList.remove('active');
-                document.getElementById('history-date').value = currentDate;
+                setVal('history-date', currentDate);
                 
                 db.collection('users').doc(user.uid).get().then(function(doc) {
                     if (doc.exists) {
@@ -598,9 +838,12 @@
                 });
             } else {
                 document.getElementById('auth-screen').classList.add('active');
-                document.getElementById('app-container').style.display = 'none';
-                document.getElementById('app-nav').style.display = 'none';
-                document.getElementById('fab-ai').style.display = 'none';
+                var appC = document.getElementById('app-container');
+                if (appC) appC.style.display = 'none';
+                var aNav = document.getElementById('app-nav');
+                if (aNav) aNav.style.display = 'none';
+                var fab = document.getElementById('fab-ai');
+                if (fab) fab.style.display = 'none';
             }
         });
 
@@ -649,6 +892,7 @@
                 setupComplete: true,
                 budgetLimit: 250,
                 waterGoal: 2500,
+                targetWeight: goal === 'lose' ? (w - 5) : (goal === 'gain' ? (w + 5) : w),
                 xp: 20,
                 streak: 1,
                 email: currentUser.email
@@ -662,36 +906,74 @@
         }
 
         function initApp() {
-            document.getElementById('app-container').style.display = 'block';
-            document.getElementById('app-nav').style.display = 'flex';
-            document.getElementById('fab-ai').style.display = 'flex';
+            var appCont = document.getElementById('app-container');
+            if (appCont) appCont.style.display = 'block';
+            var appNav = document.getElementById('app-nav');
+            if (appNav) appNav.style.display = 'flex';
+            var fabAi = document.getElementById('fab-ai');
+            if (fabAi) fabAi.style.display = 'flex';
 
-            document.getElementById('display-name').innerText = userDocData.name;
-            document.getElementById('user-avatar').src = userDocData.photo;
-            document.getElementById('cal-goal').innerText = userDocData.goalCal;
-            document.getElementById('prot-goal').innerText = userDocData.goalProt;
-            document.getElementById('fat-goal').innerText = userDocData.goalFat;
-            document.getElementById('carb-goal').innerText = userDocData.goalCarb;
-            document.getElementById('water-goal-display').innerText = userDocData.waterGoal || 2500;
-            document.getElementById('streak-badge').innerText = '🔥 ' + (userDocData.streak || 1) + ' დღე';
+            setTxt('display-name', userDocData.name || 'მომხმარებელი');
+            var avatarEl = document.getElementById('user-avatar');
+            if (avatarEl) avatarEl.src = userDocData.photo || 'https://ui-avatars.com/api/?name=User&background=10b981&color=000';
+            setTxt('cal-goal', userDocData.goalCal || 2000);
+            setTxt('prot-goal', userDocData.goalProt || 120);
+            setTxt('fat-goal', userDocData.goalFat || 60);
+            setTxt('carb-goal', userDocData.goalCarb || 150);
+            setTxt('water-goal-display', userDocData.waterGoal || 2500);
+            setTxt('streak-badge', '🔥 ' + (userDocData.streak || 1) + ' დღე');
+
+            if (userDocData.gym) {
+                setTxt('workout-title', 'დარბაზის პროგრამა & ტაიმერი');
+                setHtml('workout-desc', '1. ჩაჯდომა შტანგით (4x10)<br>2. ჟიმი წოლში (4x10)<br>3. ბლოკის ჩამოწევა ზურგზე (4x12)');
+            } else {
+                setTxt('workout-title', 'სახლის 15-წთ HIIT & ტაიმერი');
+                setHtml('workout-desc', '4 წრე: 15 ჩაჯდომა, 10 აზიდვა, 40 წმ პლანკა. შესვენება წრეებს შორის 30 წმ.');
+            }
 
             addXP(0);
 
-            if (currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-                document.getElementById('admin-nav-btn').style.display = 'flex';
+            // 🔒 STRICT ADMIN CHECK - ONLY NIKKABURNADZEE SEES ADMIN PORTAL
+            if (currentUser && currentUser.email && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+                var admNav = document.getElementById('admin-nav-btn');
+                if (admNav) admNav.style.display = 'flex';
                 loadAdminDashboard();
+            } else {
+                var admNavNo = document.getElementById('admin-nav-btn');
+                if (admNavNo) admNavNo.style.display = 'none';
             }
 
             loadDateData();
             listenToChat();
             generateSchedule();
             renderBadges();
+            renderHealthyShopping();
         }
 
+        // 🔒 INDIVIDUAL DATE DATA (Isolated to currentUser.uid)
         function loadDateData() {
-            currentDate = document.getElementById('history-date').value;
+            var dateInp = document.getElementById('history-date');
+            if (dateInp) currentDate = dateInp.value;
             db.collection('users').doc(currentUser.uid).collection('days').doc(currentDate).onSnapshot(function(doc) {
-                userData = doc.exists ? Object.assign({ foods: [], water: 0, steps: 0, weights: [], expenses: [], habits: {} }, doc.data()) : { foods: [], water: 0, steps: 0, weights: [], expenses: [], habits: {} };
+                userData = doc.exists ? Object.assign({ 
+                    foods: [], 
+                    water: 0, 
+                    steps: 0, 
+                    weights: [], 
+                    expenses: [], 
+                    habits: {},
+                    workouts: [],
+                    measurements: { waist: 0, chest: 0, hips: 0 }
+                }, doc.data()) : { 
+                    foods: [], 
+                    water: 0, 
+                    steps: 0, 
+                    weights: [], 
+                    expenses: [], 
+                    habits: {},
+                    workouts: [],
+                    measurements: { waist: 0, chest: 0, hips: 0 }
+                };
                 updateUI();
             });
         }
@@ -703,10 +985,7 @@
 
         function updateUI() {
             var foods = userData.foods || [];
-            var totalCal = 0;
-            var totalProt = 0;
-            var totalFat = 0;
-            var totalCarb = 0;
+            var totalCal = 0, totalProt = 0, totalFat = 0, totalCarb = 0;
 
             for (var i = 0; i < foods.length; i++) {
                 totalCal += Number(foods[i].cal || 0);
@@ -715,19 +994,22 @@
                 totalCarb += Number(foods[i].carb || 0);
             }
             
-            document.getElementById('cal-eaten').innerText = totalCal;
-            document.getElementById('cal-rem').innerText = Math.max(0, userDocData.goalCal - totalCal);
-            document.getElementById('prot-eaten').innerText = totalProt;
-            document.getElementById('fat-eaten').innerText = totalFat;
-            document.getElementById('carb-eaten').innerText = totalCarb;
+            setTxt('cal-eaten', totalCal);
+            setTxt('cal-rem', Math.max(0, (userDocData.goalCal || 2000) - totalCal));
+            setTxt('prot-eaten', totalProt);
+            setTxt('fat-eaten', totalFat);
+            setTxt('carb-eaten', totalCarb);
             
-            var percent = Math.min(100, Math.round((totalCal / userDocData.goalCal) * 100));
-            document.getElementById('cal-percent').innerText = percent + '%';
-            document.getElementById('macro-pie').style.background = 'conic-gradient(var(--primary) 0% ' + percent + '%, var(--surface) ' + percent + '% 100%)';
+            var percent = Math.min(100, Math.round((totalCal / (userDocData.goalCal || 2000)) * 100));
+            setTxt('cal-percent', percent + '%');
+            var pieEl = document.getElementById('macro-pie');
+            if (pieEl) {
+                pieEl.style.background = 'conic-gradient(var(--primary) 0% ' + percent + '%, var(--surface) ' + percent + '% 100%)';
+            }
 
             var mealTypes = ['breakfast', 'lunch', 'snack', 'dinner'];
             for (var m = 0; m < mealTypes.length; m++) {
-                document.getElementById('food-list-' + mealTypes[m]).innerHTML = '<h3>' + getMealName(mealTypes[m]) + '</h3>';
+                setHtml('food-list-' + mealTypes[m], '<h3>' + getMealName(mealTypes[m]) + '</h3>');
             }
             
             for (var f = 0; f < foods.length; f++) {
@@ -738,17 +1020,23 @@
                 var targetEl = document.getElementById('food-list-' + mType);
                 if (targetEl) targetEl.innerHTML += html;
             }
-            document.getElementById('food-count').innerText = '(' + foods.length + ')';
+            setTxt('food-count', '(' + foods.length + ')');
 
+            // Water
             var w = userData.water || 0;
             var wGoal = userDocData.waterGoal || 2500;
-            document.getElementById('water-val').innerText = w;
-            document.getElementById('water-wave').style.height = Math.min(100, (w / wGoal) * 100) + '%';
+            setTxt('water-val', w);
+            var waveEl = document.getElementById('water-wave');
+            if (waveEl) waveEl.style.height = Math.min(100, (w / wGoal) * 100) + '%';
 
+            // Steps & Walking
             var s = userData.steps || 0;
-            document.getElementById('step-val').innerText = s;
-            document.getElementById('step-progress').style.width = Math.min(100, (s / 10000) * 100) + '%';
+            setTxt('step-val', s);
+            var stepProg = document.getElementById('step-progress');
+            if (stepProg) stepProg.style.width = Math.min(100, (s / 10000) * 100) + '%';
+            setTxt('walk-minutes', Math.round(s / 100));
 
+            // Habits
             var habits = ['vitamin', 'stretch', 'sugar'];
             for (var h = 0; h < habits.length; h++) {
                 var el = document.getElementById('habit-' + habits[h]);
@@ -761,23 +1049,51 @@
                 }
             }
 
+            // Workouts log
+            var wLogHtml = '';
+            var woList = userData.workouts || [];
+            for (var wki = 0; wki < woList.length; wki++) {
+                wLogHtml += '<div class="list-item"><div class="item-row"><div><b>' + escapeHTML(woList[wki].name) + '</b><div class="item-sub">' + woList[wki].sets + ' სეტი x ' + woList[wki].reps + ' (' + woList[wki].weight + ' კგ)</div></div><button class="danger" style="padding:4px 10px; font-size:11px; width:auto;" onclick="deleteWorkoutLog(' + wki + ')">X წაშლა</button></div></div>';
+            }
+            setHtml('workout-log-list', wLogHtml || '<div class="item-sub">დღეს ვარჯიში ჯერ არ ჩაგიწერია.</div>');
+
+            // Measurements
+            var meas = userData.measurements || {};
+            setVal('measure-waist', meas.waist || '');
+            setVal('measure-chest', meas.chest || '');
+            setVal('measure-hips', meas.hips || '');
+
+            // Budget
             var limit = userDocData.budgetLimit || 250;
-            document.getElementById('display-budget-total').innerText = limit;
+            setTxt('display-budget-total', limit);
             var expenses = userData.expenses || [];
             var spentMonth = 0;
+            var expHtml = '';
             for (var ex = 0; ex < expenses.length; ex++) {
                 if (expenses[ex].date && expenses[ex].date.indexOf(currentMonth) === 0) {
                     spentMonth += Number(expenses[ex].amount || 0);
                 }
+                expHtml += '<div class="list-item"><div class="item-row"><div><b>' + escapeHTML(expenses[ex].name) + '</b><div class="item-sub">' + expenses[ex].date + '</div></div><div style="display:flex; align-items:center; gap:8px;"><b style="color:var(--danger)">' + expenses[ex].amount + ' ₾</b><button class="danger" style="padding:2px 8px; font-size:10px;" onclick="deleteExpense(' + ex + ')">X</button></div></div></div>';
             }
-            document.getElementById('budget-spent').innerText = spentMonth.toFixed(1);
-            document.getElementById('budget-rem').innerText = (limit - spentMonth).toFixed(1);
+            setTxt('budget-spent', spentMonth.toFixed(1));
+            setTxt('budget-rem', (limit - spentMonth).toFixed(1));
+            setHtml('expense-list', expHtml || '<div class="item-sub">ხარჯები არ არის ჩაწერილი.</div>');
 
-            // Chart Update
+            // Weight calculation & Chart
+            var wData = (userData.weights && userData.weights.length > 0) ? userData.weights : [{ date: currentDate, weight: (userDocData.targetWeight || 70) }];
+            var currentWeight = wData[wData.length - 1].weight || 70;
+            var tw = userDocData.targetWeight || 70;
+            var remKg = Math.abs(currentWeight - tw).toFixed(1);
+            setTxt('remaining-weight-kg', remKg + ' კგ');
+
+            var sumW = 0;
+            for (var sw = 0; sw < wData.length; sw++) sumW += Number(wData[sw].weight || 0);
+            var avgW = (sumW / wData.length).toFixed(1);
+            setTxt('weekly-avg-weight', avgW + ' კგ');
+
             var ctx = document.getElementById('weightChart');
             if (ctx) {
                 if (window.myChartObj) window.myChartObj.destroy();
-                var wData = userData.weights || [{ date: currentDate, weight: 70 }];
                 var labels = [];
                 var data = [];
                 for (var wi = 0; wi < wData.length; wi++) {
@@ -805,6 +1121,8 @@
                     }
                 });
             }
+
+            setTxt('weekly-report-text', 'დღეს: ' + totalCal + '/' + (userDocData.goalCal || 2000) + ' კკალ | წყალი: ' + w + ' მლ | ნაბიჯები: ' + s + ' | საშუალო წონა: ' + avgW + ' კგ');
         }
 
         function getMealName(m) {
@@ -812,11 +1130,13 @@
             return map[m] || 'წახემსება';
         }
 
+        // FOOD SEARCH
         function searchFood() {
-            var q = document.getElementById('food-search').value.toLowerCase();
+            var searchInp = document.getElementById('food-search');
+            var q = searchInp ? searchInp.value.toLowerCase() : '';
             var res = document.getElementById('food-search-results');
             if (!q || q.length < 2) {
-                res.innerHTML = '';
+                if (res) res.innerHTML = '';
                 return;
             }
             
@@ -825,12 +1145,12 @@
                 var f = foodDatabase[i];
                 if (f.name.toLowerCase().indexOf(q) !== -1) {
                     html += '<div style="padding: 10px; border-bottom: 1px solid var(--glass-border); display:flex; justify-content:space-between; align-items:center;">' +
-                        '<div><b>' + f.name + '</b> <span style="font-size:11px; color:var(--text-muted)">' + f.cal + ' კკალ | ' + f.prot + 'გ ცილა</span></div>' +
+                        '<div><b>' + f.name + '</b> <span style="font-size:11px; color:var(--text-muted)">' + f.cal + ' კკალ | ' + f.prot + 'გ ცილა | ' + f.fat + 'გ ცხიმი</span></div>' +
                         '<button class="secondary" style="padding:6px 12px; font-size:11px; width:auto;" onclick="addSearchedFood(' + i + ')">დამატება</button>' +
                         '</div>';
                 }
             }
-            res.innerHTML = html;
+            if (res) res.innerHTML = html;
         }
 
         function addSearchedFood(index) {
@@ -846,8 +1166,8 @@
                 isUnhealthy: f.bad,
                 meal: 'snack'
             });
-            document.getElementById('food-search').value = '';
-            document.getElementById('food-search-results').innerHTML = '';
+            setVal('food-search', '');
+            setHtml('food-search-results', '');
             addXP(10);
             saveCloudData();
             showNotification(f.bad ? "❌ არაჯანსაღი საკვები!" : "✅ დაემატა (+10 XP)", f.bad);
@@ -858,6 +1178,36 @@
             saveCloudData();
         }
 
+        function clearAllFoods() {
+            if (confirm("ნამდვილად გსურს დღევანდელი კვების სრულად წაშლა?")) {
+                userData.foods = [];
+                saveCloudData();
+                showNotification("🗑️ კვება გასუფთავდა!");
+            }
+        }
+
+        function copyYesterdayFoods() {
+            var d = new Date(currentDate);
+            d.setDate(d.getDate() - 1);
+            var y = d.getFullYear();
+            var m = String(d.getMonth() + 1);
+            if (m.length < 2) m = '0' + m;
+            var day = String(d.getDate());
+            if (day.length < 2) day = '0' + day;
+            var prevDate = y + '-' + m + '-' + day;
+            
+            db.collection('users').doc(currentUser.uid).collection('days').doc(prevDate).get().then(function(doc) {
+                if (doc.exists && doc.data().foods && doc.data().foods.length > 0) {
+                    userData.foods = (userData.foods || []).concat(doc.data().foods);
+                    saveCloudData();
+                    showNotification("📋 კოპირებულია!");
+                } else {
+                    showNotification("წინა დღის მონაცემები ვერ მოიძებნა", true);
+                }
+            });
+        }
+
+        // WATER & STEPS
         function addWater(a) {
             userData.water = (userData.water || 0) + a;
             addXP(5);
@@ -865,13 +1215,45 @@
             if (userData.water >= (userDocData.waterGoal || 2500)) triggerConfetti();
         }
 
+        function minusWater(a) {
+            userData.water = Math.max(0, (userData.water || 0) - a);
+            saveCloudData();
+            showNotification("💧 გამოაკლდა " + a + " მლ");
+        }
+
+        function resetWater() {
+            if (confirm("ნამდვილად გსურს წყლის განულება?")) {
+                userData.water = 0;
+                saveCloudData();
+                showNotification("💧 წყალი განულდა");
+            }
+        }
+
+        function addCustomWater() {
+            var el = document.getElementById('custom-water-input');
+            var v = el ? parseInt(el.value, 10) : 0;
+            if (v && v > 0) {
+                addWater(v);
+                setVal('custom-water-input', '');
+            }
+        }
+
         function addSteps() {
-            var v = parseInt(document.getElementById('steps-input').value, 10);
+            var el = document.getElementById('steps-input');
+            var v = el ? parseInt(el.value, 10) : 0;
             if (v > 0) {
                 userData.steps = (userData.steps || 0) + v;
                 addXP(15);
                 saveCloudData();
-                document.getElementById('steps-input').value = '';
+                setVal('steps-input', '');
+            }
+        }
+
+        function resetSteps() {
+            if (confirm("ნამდვილად გსურს ნაბიჯების განულება?")) {
+                userData.steps = 0;
+                saveCloudData();
+                showNotification("🚶 ნაბიჯები განულდა");
             }
         }
 
@@ -882,17 +1264,140 @@
             saveCloudData();
         }
 
+        // WORKOUT TIMER & LOG
+        var wTimer = null;
+        var wSecondsLeft = 15 * 60;
+        var wIsRunning = false;
+
+        function toggleWorkoutTimer() {
+            var btn = document.getElementById('workout-btn');
+            if (wIsRunning) {
+                clearInterval(wTimer);
+                wIsRunning = false;
+                if (btn) btn.innerText = "გაგრძელება";
+            } else {
+                wIsRunning = true;
+                if (btn) btn.innerText = "პაუზა";
+                wTimer = setInterval(function() {
+                    if (wSecondsLeft <= 0) {
+                        clearInterval(wTimer);
+                        wIsRunning = false;
+                        if (btn) btn.innerText = "დასრულდა!";
+                        showNotification("🎉 ვარჯიში დასრულდა!");
+                        addXP(30);
+                        triggerConfetti();
+                        return;
+                    }
+                    wSecondsLeft--;
+                    var m = Math.floor(wSecondsLeft / 60).toString();
+                    var s = (wSecondsLeft % 60).toString();
+                    if (m.length < 2) m = '0' + m;
+                    if (s.length < 2) s = '0' + s;
+                    setTxt('w-time', m + ':' + s);
+                }, 1000);
+            }
+        }
+
+        function resetWorkoutTimer() {
+            clearInterval(wTimer);
+            wIsRunning = false;
+            wSecondsLeft = 15 * 60;
+            setTxt('w-time', '15:00');
+            var btn = document.getElementById('workout-btn');
+            if (btn) btn.innerText = "დაწყება";
+        }
+
+        function addWorkoutLog() {
+            var nameEl = document.getElementById('wo-name');
+            var setsEl = document.getElementById('wo-sets');
+            var repsEl = document.getElementById('wo-reps');
+            var weightEl = document.getElementById('wo-weight');
+
+            var name = nameEl ? escapeHTML(nameEl.value) : '';
+            var sets = setsEl ? parseInt(setsEl.value, 10) : 0;
+            var reps = repsEl ? parseInt(repsEl.value, 10) : 0;
+            var weight = weightEl ? (parseFloat(weightEl.value) || 0) : 0;
+
+            if (!name || !sets || !reps) return alert("შეიყვანე ვარჯიშის სახელი, სეტები და გამეორებები!");
+            if (!userData.workouts) userData.workouts = [];
+            userData.workouts.push({ name: name, sets: sets, reps: reps, weight: weight });
+            addXP(20);
+            saveCloudData();
+            setVal('wo-name', '');
+            setVal('wo-sets', '');
+            setVal('wo-reps', '');
+            setVal('wo-weight', '');
+            showNotification("💪 ვარჯიში ჩაიწერა!");
+        }
+
+        function deleteWorkoutLog(index) {
+            if (confirm("წავშალოთ ეს ვარჯიში?")) {
+                userData.workouts.splice(index, 1);
+                saveCloudData();
+                showNotification("🗑️ ვარჯიში წაიშალა");
+            }
+        }
+
+        // MEASUREMENTS & WEIGHT
+        function addWeight() {
+            var el = document.getElementById('weight-input');
+            var w = el ? parseFloat(el.value) : 0;
+            if (w) {
+                if (!userData.weights) userData.weights = [];
+                userData.weights.push({ date: currentDate, weight: w });
+                addXP(20);
+                saveCloudData();
+                setVal('weight-input', '');
+                triggerConfetti();
+                showNotification("⚖️ წონა შენახულია!");
+            }
+        }
+
+        function saveMeasurements() {
+            var waistEl = document.getElementById('measure-waist');
+            var chestEl = document.getElementById('measure-chest');
+            var hipsEl = document.getElementById('measure-hips');
+
+            var waist = waistEl ? (parseFloat(waistEl.value) || 0) : 0;
+            var chest = chestEl ? (parseFloat(chestEl.value) || 0) : 0;
+            var hips = hipsEl ? (parseFloat(hipsEl.value) || 0) : 0;
+
+            userData.measurements = { waist: waist, chest: chest, hips: hips };
+            saveCloudData();
+            showNotification("📏 გარშემოწერილობა შენახულია!");
+        }
+
+        function shareReport() {
+            var el = document.getElementById('weekly-report-text');
+            var text = el ? el.innerText : '';
+            if (navigator.share) {
+                navigator.share({ title: 'My Fitness Coach Report', text: text });
+            } else {
+                if (navigator.clipboard) navigator.clipboard.writeText(text);
+                showNotification("📋 რეპორტი დაკოპირდა!");
+            }
+        }
+
+        // BUDGET
         function addExpense() {
-            var n = escapeHTML(document.getElementById('expense-name').value);
-            var a = parseFloat(document.getElementById('expense-amount').value);
+            var nEl = document.getElementById('expense-name');
+            var aEl = document.getElementById('expense-amount');
+            var n = nEl ? escapeHTML(nEl.value) : '';
+            var a = aEl ? parseFloat(aEl.value) : 0;
+
             if (n && a) {
                 if (!userData.expenses) userData.expenses = [];
                 userData.expenses.push({ date: currentDate, name: n, amount: a });
                 saveCloudData();
-                document.getElementById('expense-name').value = '';
-                document.getElementById('expense-amount').value = '';
-                showNotification("💰 დაემატა");
+                setVal('expense-name', '');
+                setVal('expense-amount', '');
+                showNotification("💰 ხარჯი დაემატა");
             }
+        }
+
+        function deleteExpense(i) {
+            userData.expenses.splice(i, 1);
+            saveCloudData();
         }
 
         function updateBudgetLimit() {
@@ -904,43 +1409,71 @@
             }
         }
 
-        function addWeight() {
-            var w = parseFloat(document.getElementById('weight-input').value);
-            if (w) {
-                if (!userData.weights) userData.weights = [];
-                userData.weights.push({ date: currentDate, weight: w });
-                addXP(20);
-                saveCloudData();
-                document.getElementById('weight-input').value = '';
-                triggerConfetti();
+        function renderHealthyShopping() {
+            var html = '';
+            for (var i = 0; i < healthyShoppingList.length; i++) {
+                var it = healthyShoppingList[i];
+                html += '<div class="list-item"><div class="item-row"><div><b>' + it.name + '</b><div class="item-sub">~' + it.price + ' ₾</div></div><button class="secondary" style="padding:6px 12px; font-size:11px; width:auto;" onclick="quickBuyItem(' + i + ')">ვიყიდე</button></div></div>';
             }
+            setHtml('healthy-shopping-list', html);
         }
 
-        function copyYesterdayFoods() {
-            var d = new Date(currentDate);
-            d.setDate(d.getDate() - 1);
-            var prevDate = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Tbilisi' });
-            
-            db.collection('users').doc(currentUser.uid).collection('days').doc(prevDate).get().then(function(doc) {
-                if (doc.exists && doc.data().foods) {
-                    userData.foods = (userData.foods || []).concat(doc.data().foods);
-                    saveCloudData();
-                    showNotification("📋 კოპირებულია!");
-                } else {
-                    showNotification("წინა დღის მონაცემები ვერ მოიძებნა", true);
-                }
-            });
+        function quickBuyItem(i) {
+            var it = healthyShoppingList[i];
+            if (!userData.expenses) userData.expenses = [];
+            userData.expenses.push({ date: currentDate, name: it.name, amount: it.price });
+            saveCloudData();
+            showNotification("✅ " + it.name + " ჩაიწერა ხარჯებში!");
         }
 
-        // FASTING TIMER (PERSISTENT & 100% COMPATIBLE)
+        // SCHEDULE LOGIC
+        function timeMath(timeStr, addMins) {
+            var parts = timeStr.split(':');
+            var h = parseInt(parts[0], 10);
+            var m = parseInt(parts[1], 10) + addMins;
+            while (m < 0) { m += 60; h -= 1; }
+            while (m >= 60) { m -= 60; h += 1; }
+            while (h < 0) { h += 24; }
+            while (h >= 24) { h -= 24; }
+            var hh = h.toString();
+            var mm = m.toString();
+            if (hh.length < 2) hh = '0' + hh;
+            if (mm.length < 2) mm = '0' + mm;
+            return hh + ':' + mm;
+        }
+
+        function generateSchedule() {
+            var wStartEl = document.getElementById('work-start');
+            var wEndEl = document.getElementById('work-end');
+            var wakeEl = document.getElementById('wake-time');
+            var sleepEl = document.getElementById('sleep-time');
+
+            var wStart = wStartEl ? wStartEl.value : "10:00";
+            var wEnd = wEndEl ? wEndEl.value : "19:00";
+            var wake = wakeEl ? wakeEl.value : "08:00";
+            var sleep = sleepEl ? sleepEl.value : "23:30";
+
+            var html = '';
+            html += '<div class="list-item"><div class="item-row"><div><b>' + wake + '</b><div class="item-sub">გაღვიძება, 1 ჭიქა წყალი და მსუბუქი გაჭიმვა</div></div></div></div>';
+            html += '<div class="list-item"><div class="item-row"><div><b>' + timeMath(wake, 30) + '</b><div class="item-sub">ცილოვანი საუზმე (კვერცხი / შვრია)</div></div></div></div>';
+            html += '<div class="list-item"><div class="item-row"><div><b>' + wStart + '</b><div class="item-sub">სამსახურის დაწყება + 250მლ წყალი</div></div></div></div>';
+            html += '<div class="list-item"><div class="item-row"><div><b>' + timeMath(wStart, 210) + '</b><div class="item-sub">სადილი (ქათმის ფილე + წიწიბურა / ბრინჯი)</div></div></div></div>';
+            html += '<div class="list-item"><div class="item-row"><div><b>' + wEnd + '</b><div class="item-sub">სამსახურის დასრულება, ფეხით გასეირნება</div></div></div></div>';
+            html += '<div class="list-item"><div class="item-row"><div><b>' + timeMath(wEnd, 60) + '</b><div class="item-sub">ვახშამი & 18:6 შიმშილის ტაიმერის ჩართვა</div></div></div></div>';
+            html += '<div class="list-item"><div class="item-row"><div><b>' + sleep + '</b><div class="item-sub">დაძინება (ეკრანების გარეშე, ღრმა ძილისთვის)</div></div></div></div>';
+
+            setHtml('schedule-list', html);
+        }
+
+        // FASTING TIMER
         var fTimer = null;
         function toggleFasting() {
             var el = document.getElementById('fasting-time');
             if (localStorage.getItem('fastingStart')) {
                 localStorage.removeItem('fastingStart');
                 clearInterval(fTimer);
-                el.innerText = "00:00:00";
-                showNotification("🎉 დასრულდა!");
+                if (el) el.innerText = "00:00:00";
+                showNotification("🎉 შიმშილი დასრულდა!");
             } else {
                 localStorage.setItem('fastingStart', Date.now());
                 showNotification("⏳ ტაიმერი ჩაირთო");
@@ -960,24 +1493,26 @@
                 if (h.length < 2) h = '0' + h;
                 if (m.length < 2) m = '0' + m;
                 if (s.length < 2) s = '0' + s;
-                document.getElementById('fasting-time').innerText = h + ':' + m + ':' + s;
+                setTxt('fasting-time', h + ':' + m + ':' + s);
             }, 1000);
         }
         if (localStorage.getItem('fastingStart')) startFastingLoop();
 
-        // CHAT & AI BRAIN
+        // 💬 1-ON-1 DIRECT CHAT (ISOLATED TO CURRENT USER)
         function sendMessage() {
-            var t = escapeHTML(document.getElementById('chat-input').value.trim());
-            if (!t) return;
+            var el = document.getElementById('chat-input');
+            var t = el ? escapeHTML(el.value.trim()) : '';
+            if (!t || !currentUser) return;
             db.collection('chats').doc(currentUser.uid).collection('messages').add({
                 sender: currentUser.email,
                 text: t,
                 time: new Date()
             });
-            document.getElementById('chat-input').value = '';
+            setVal('chat-input', '');
         }
 
         function listenToChat() {
+            if (!currentUser) return;
             db.collection('chats').doc(currentUser.uid).collection('messages').orderBy('time').onSnapshot(function(snap) {
                 var html = '';
                 snap.forEach(function(d) {
@@ -986,34 +1521,70 @@
                     html += '<div class="msg-bubble ' + (isMe ? 'me' : 'coach') + '">' + m.text + '</div>';
                 });
                 var b = document.getElementById('chat-box');
-                b.innerHTML = html;
-                b.scrollTop = b.scrollHeight;
+                if (b) {
+                    b.innerHTML = html;
+                    b.scrollTop = b.scrollHeight;
+                }
             });
         }
 
         function toggleAiModal() {
-            document.getElementById('ai-modal').classList.toggle('active');
+            var modal = document.getElementById('ai-modal');
+            if (modal) modal.classList.toggle('active');
         }
 
+        // 🤖 ADVANCED AI BOT INTELLIGENCE
         function askAi() {
             var input = document.getElementById('ai-input');
-            var v = input.value.trim().toLowerCase();
+            var v = input ? input.value.trim().toLowerCase() : '';
             if (!v) return;
             var b = document.getElementById('ai-chat-box');
-            b.innerHTML += '<div class="msg-bubble me">' + escapeHTML(v) + '</div>';
-            input.value = '';
+            if (b) b.innerHTML += '<div class="msg-bubble me">' + escapeHTML(v) + '</div>';
+            setVal('ai-input', '');
             
             setTimeout(function() {
-                var reply = "საინტერესო კითხვაა! ზუსტი პასუხისთვის პირდაპირ მწვრთნელს მიწერე (ჩატის ტაბიდან).";
-                for (var key in aiBrain) {
-                    if (v.indexOf(key) !== -1) {
-                        reply = aiBrain[key];
+                var reply = "";
+
+                // 1. Food Database Match
+                for (var f = 0; f < foodDatabase.length; f++) {
+                    var item = foodDatabase[f];
+                    var baseName = item.name.split(' ')[0].toLowerCase();
+                    if (v.indexOf(baseName) !== -1 || (baseName.length > 3 && v.indexOf(baseName.slice(0, -1)) !== -1)) {
+                        reply = item.name + ": შეიცავს ~" + item.cal + " კკალორიას, " + item.prot + "გ ცილას, " + item.fat + "გ ცხიმს და " + item.carb + "გ ნახშირწყალს. " + (item.bad ? "შეიცავს ჭარბ კალორიებს/ცხიმს, ამიტომ მიირთვით ზომიერად!" : "შესანიშნავი, ჯანსაღი არჩევანია თქვენი რაციონისთვის!");
                         break;
                     }
                 }
-                b.innerHTML += '<div class="msg-bubble coach">🤖 ' + reply + '</div>';
-                b.scrollTop = b.scrollHeight;
-            }, 400);
+
+                // 2. Comprehensive Fitness & Nutrition Knowledge
+                if (!reply) {
+                    for (var key in aiBrain) {
+                        if (v.indexOf(key) !== -1) {
+                            reply = aiBrain[key];
+                            break;
+                        }
+                    }
+                }
+
+                // 3. Fallback Smart Contexts
+                if (!reply) {
+                    if (v.indexOf("ჭამ") !== -1 || v.indexOf("საჭმელ") !== -1 || v.indexOf("მშია") !== -1) {
+                        reply = "თუ შიმშილს გრძნობთ, უპირატესობა მიანიჭეთ მაღალცილოვან ან ბოჭკოთი მდიდარ პროდუქტებს: მოხარშული კვერცხი, ხაჭო, მაწონი, კიტრი და პომიდორი. კონკრეტული საკვების შესამოწმებლად უბრალოდ მომწერეთ მისი სახელი (მაგ: ქათამი, ბანანი, ხინკალი)!";
+                    } else if (v.indexOf("ვარჯიშ") !== -1 || v.indexOf("დარბაზ") !== -1) {
+                        reply = "ვარჯიშის დროს მთავარია რეგულარულობა და სწორი ტექნიკა. დაიწყეთ გახურებით და შეასრულეთ 3-4 სეტი. თქვენი პირადი ვარჯიშის გეგმა იხილეთ 'აქტივობის' ტაბში!";
+                    } else if (v.indexOf("როგორ") !== -1 || v.indexOf("დავიკლო") !== -1) {
+                        reply = "წონის კლების 4 მთავარი წესი: 1. კალორიული დეფიციტი (დაიცავით დღიური ნორმა); 2. 2.5ლ წყალი; 3. 10,000 ნაბიჯი; 4. მინიმუმ 1.6გ ცილა თითოეულ კილოგრამ წონაზე.";
+                    } else if (v.indexOf("გამარჯობა") !== -1 || v.indexOf("სალამი") !== -1 || v.indexOf("ჰეი") !== -1) {
+                        reply = "გამარჯობა! მე ვარ შენი პერსონალური AI ასისტენტი. რით შემიძლია დაგეხმარო დღეს კვებასა თუ ვარჯიშში?";
+                    } else {
+                        reply = "შესანიშნავი კითხვაა! ფიტნესში უმთავრესია კალორიული ბალანსი, საკმარისი ცილა (1.6-2გ/კგ), 2.5ლ წყალი და ხარისხიანი ძილი. თუ კონკრეტული პროდუქტის კალორიები გაინტერესებთ, მომწერეთ პროდუქტის სახელი!";
+                    }
+                }
+
+                if (b) {
+                    b.innerHTML += '<div class="msg-bubble coach">🤖 ' + reply + '</div>';
+                    b.scrollTop = b.scrollHeight;
+                }
+            }, 300);
         }
 
         // BADGES
@@ -1028,25 +1599,36 @@
             for (var i = 0; i < badges.length; i++) {
                 html += '<div class="badge-card ' + (badges[i].cond ? 'unlocked' : '') + '">' + badges[i].name + '</div>';
             }
-            document.getElementById('badges-container').innerHTML = html;
+            setHtml('badges-container', html);
         }
 
         // SETTINGS
         function openSettings() {
-            document.getElementById('settings-modal').classList.add('active');
-            document.getElementById('set-name').value = userDocData.name || '';
-            document.getElementById('set-photo').value = userDocData.photo || '';
+            var modal = document.getElementById('settings-modal');
+            if (modal) modal.classList.add('active');
+            setVal('set-name', userDocData.name || '');
+            setVal('set-photo', userDocData.photo || '');
+            setVal('set-target-weight', userDocData.targetWeight || 70);
         }
         function closeSettings() {
-            document.getElementById('settings-modal').classList.remove('active');
+            var modal = document.getElementById('settings-modal');
+            if (modal) modal.classList.remove('active');
         }
         function saveSettings() {
-            var n = escapeHTML(document.getElementById('set-name').value);
-            var p = escapeHTML(document.getElementById('set-photo').value);
-            var pwd = document.getElementById('set-password').value;
+            var nameEl = document.getElementById('set-name');
+            var photoEl = document.getElementById('set-photo');
+            var twEl = document.getElementById('set-target-weight');
+            var pwdEl = document.getElementById('set-password');
+
+            var n = nameEl ? escapeHTML(nameEl.value) : '';
+            var p = photoEl ? escapeHTML(photoEl.value) : '';
+            var tw = twEl ? (parseFloat(twEl.value) || 70) : 70;
+            var pwd = pwdEl ? pwdEl.value : '';
+
             var updates = {};
             if (n) updates.name = n;
             if (p) updates.photo = p;
+            updates.targetWeight = tw;
             db.collection('users').doc(currentUser.uid).update(updates).then(function() {
                 if (pwd) currentUser.updatePassword(pwd).then(function() { alert("პაროლი შეიცვალა"); });
                 closeSettings();
@@ -1054,21 +1636,41 @@
             });
         }
 
-        // ADMIN PORTAL
+        // 👑 ADMIN PORTAL (ONLY ACCESSED BY nikkaburnadzee@gmail.com)
         function loadAdminDashboard() {
+            if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
+            
             db.collection('users').onSnapshot(function(snap) {
                 var d = '<option value="">-- აირჩიე მომხმარებელი --</option>';
+                var listHtml = '';
                 snap.forEach(function(doc) {
                     var u = doc.data();
                     var uid = doc.id;
                     d += '<option value="' + uid + '">' + escapeHTML(u.email) + '</option>';
+
+                    db.collection('users').doc(uid).collection('days').doc(currentDate).get().then(function(dayDoc) {
+                        var dData = dayDoc.exists ? dayDoc.data() : { foods: [], water: 0, steps: 0 };
+                        var cals = 0;
+                        var badFood = false;
+                        var fList = dData.foods || [];
+                        for (var fi = 0; fi < fList.length; fi++) {
+                            cals += Number(fList[fi].cal || 0);
+                            if (fList[fi].isUnhealthy) badFood = true;
+                        }
+
+                        var alertTag = badFood ? '<span style="color:var(--danger); font-weight:bold;">⚠️ დარღვევა</span>' : '<span style="color:var(--primary);">✅ წესრიგშია</span>';
+
+                        listHtml += '<div class="list-item" style="border-color:' + (badFood ? 'var(--danger)' : 'var(--glass-border)') + '"><div class="item-row"><div><b>' + escapeHTML(u.email) + '</b><div class="item-sub">კალორია: ' + cals + ' | წყალი: ' + (dData.water || 0) + ' მლ</div></div><div>' + alertTag + '</div></div></div>';
+                        setHtml('admin-user-list', listHtml);
+                    });
                 });
-                document.getElementById('admin-user-dropdown').innerHTML = d;
+                setHtml('admin-user-dropdown', d);
             });
         }
 
         var admUnsub = null;
         function loadAdminChatWithUser(uid) {
+            if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
             selectedAdminUserUid = uid;
             if (!uid) return;
             if (admUnsub) admUnsub();
@@ -1080,29 +1682,46 @@
                     h += '<div class="msg-bubble ' + (me ? 'me' : 'coach') + '"><b>' + escapeHTML(m.sender) + ':</b> ' + escapeHTML(m.text) + '</div>';
                 });
                 var b = document.getElementById('admin-chat-box');
-                b.innerHTML = h;
-                b.scrollTop = b.scrollHeight;
+                if (b) {
+                    b.innerHTML = h;
+                    b.scrollTop = b.scrollHeight;
+                }
             });
         }
 
         function sendAdminReply() {
+            if (!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
             var input = document.getElementById('admin-chat-input');
-            var t = escapeHTML(input.value);
+            var t = input ? escapeHTML(input.value) : '';
             if (!t || !selectedAdminUserUid) return;
             db.collection('chats').doc(selectedAdminUserUid).collection('messages').add({
                 sender: ADMIN_EMAIL,
                 text: t,
                 time: new Date()
             });
-            input.value = '';
+            setVal('admin-chat-input', '');
         }
 
-        function generateSchedule() {
-            var s = document.getElementById('work-start').value;
-            document.getElementById('schedule-list').innerHTML = '<div class="list-item"><b>' + s + '</b><span class="item-sub">სამუშაოს დაწყება და დღის გეგმის ჩართვა.</span></div>';
+        function backupClientData() {
+            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userData));
+            var a = document.createElement('a');
+            a.setAttribute("href", dataStr);
+            a.setAttribute("download", "fitness_backup_" + currentDate + ".json");
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
         }
 
+        // TABS NAVIGATION (WITH STRICT ADMIN GUARD)
         function switchTab(id, btn) {
+            // Strict security guard for Admin Portal
+            if (id === 'admin') {
+                if (!currentUser || !currentUser.email || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+                    showNotification("წვდომა შეზღუდულია! მხოლოდ ადმინისტრატორისთვის.", true);
+                    return;
+                }
+            }
+
             var contents = document.querySelectorAll('.tab-content');
             for (var i = 0; i < contents.length; i++) contents[i].classList.remove('active');
             var buttons = document.querySelectorAll('.nav-btn');
