@@ -173,6 +173,15 @@
         </div>
     </div>
 
+    <script>
+    window.addEventListener('error', function(e) {
+      var status = document.getElementById('auth-status');
+      if (status && (!window.firebase || /script/i.test(String(e.message || '')))) {
+        status.textContent = 'ჩატვირთვის შეცდომა: ' + (e.message || 'გარე სკრიპტი ვერ ჩაიტვირთა') + '. სცადე HTTPS საიტიდან და არა file:// preview-დან.';
+        status.style.color = '#fca5a5';
+      }
+    }, true);
+    </script>
     <!-- Auth Screen -->
     <div id="auth-screen" class="full-screen active" style="justify-content: center; align-items: center;">
         <div class="card" style="width: 100%; max-width: 380px; text-align: center; padding: 30px 22px;">
@@ -183,6 +192,7 @@
             <p style="color: var(--text-muted); font-size: 11.5px; margin-bottom: 20px;">პრემიუმ ფიტნეს ეკოსისტემა</p>
             <input type="email" id="auth-email" placeholder="ელ-ფოსტა (Gmail)">
             <input type="password" id="auth-password" placeholder="პაროლი (მინ. 6 სიმბოლო)">
+            <div id="auth-status" role="status" aria-live="polite" style="display:block; min-height:36px; margin:8px 0; padding:9px; border:1px solid rgba(255,255,255,.15); border-radius:10px; font-size:12px; color:#e2e8f0; overflow-wrap:anywhere;">ავტორიზაციის სისტემის შემოწმება...</div>
             <button onclick="loginUser()" style="width:100%; margin-top:4px;">შესვლა</button>
             <button class="secondary" onclick="registerUser()" style="width:100%; margin-top:8px;">რეგისტრაცია</button>
             <div style="margin-top:14px;">
@@ -191,19 +201,11 @@
         </div>
     </div>
 
-    <!-- Email Verification Guard Screen -->
-    <div id="verify-screen" class="full-screen" style="justify-content: center; align-items: center;">
+    <!-- Email Verification Guard Screen (Deprecated but kept for structure) -->
+    <div id="verify-screen" class="full-screen" style="justify-content: center; align-items: center; display:none;">
         <div class="card" style="width: 100%; max-width: 380px; text-align: center; padding: 28px 20px;">
-            <div style="width:50px; height:50px; background:rgba(245,158,11,0.15); border:1px solid var(--warning); border-radius:14px; display:flex; justify-content:center; align-items:center; margin:0 auto 16px auto;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-            </div>
             <h1 style="font-size: 19px; margin-bottom: 8px;">დაადასტურეთ ელ-ფოსტა</h1>
-            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 18px; line-height: 1.5;">
-                თქვენს ელ-ფოსტაზე (<b id="unverified-email-text" style="color:var(--text);"></b>) გაგზავნილია ვერიფიკაციის ბმული.
-            </p>
             <button onclick="checkEmailVerified()" style="width:100%; margin-bottom:8px;">დავადასტურე (შემოწმება) 🔄</button>
-            <button class="secondary" onclick="resendVerificationEmail()" style="width:100%; margin-bottom:8px;">ხელახლა გაგზავნა ✉️</button>
-            <button class="danger" onclick="logoutUser()" style="width:100%;">გამოსვლა</button>
         </div>
     </div>
 
@@ -284,7 +286,7 @@
             <!-- Daily Quote -->
             <div class="quote-box" id="daily-quote">"დისციპლინა არის ხიდი მიზნებსა და მიღწევებს შორის."</div>
 
-            <!-- Quick Actions Bar (ნაწილი 1) -->
+            <!-- Quick Actions Bar -->
             <div class="quick-actions-bar">
                 <div class="quick-btn" onclick="quickActionAddFood()">🥗 + საკვები</div>
                 <div class="quick-btn" onclick="addWater(250)">💧 +250მლ წყალი</div>
@@ -293,7 +295,7 @@
                 <div class="quick-btn" onclick="openDashboardCustomizer()">🎨 მოწესრიგება</div>
             </div>
 
-            <!-- TAB 1: SMART DASHBOARD 2.0 (ნაწილი 1) -->
+            <!-- TAB 1: SMART DASHBOARD 2.0 -->
             <div id="tab-dashboard" class="tab-content active">
                 <div id="dashboard-cards-container">
                     
@@ -325,7 +327,10 @@
                             </div>
                             <div class="stat-box" style="padding:8px;">
                                 <div style="color:var(--accent); font-size:11px; font-weight:700;">ცხიმი / ნახშ.</div>
-                                <div style="font-size:14px; font-weight:800;"><span id="fat-eaten">0</span>გ / <span id="carb-eaten">0</span>გ</div>
+                                <div style="font-size:12px; font-weight:800; display:flex; flex-direction:column; align-items:center;">
+                                    <span><span id="fat-eaten" style="color:var(--text);">0</span>/<span id="fat-goal">60</span>გ ცხ</span>
+                                    <span><span id="carb-eaten" style="color:var(--text);">0</span>/<span id="carb-goal">150</span>გ ნახ</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -371,7 +376,7 @@
                 </div>
             </div>
 
-            <!-- TAB 2: SMART MEAL PLANNER 2.0 & RECIPES (ნაწილები 2 & 7) -->
+            <!-- TAB 2: SMART MEAL PLANNER 2.0 & RECIPES -->
             <div id="tab-diet" class="tab-content">
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -385,13 +390,12 @@
                         <input type="text" id="meal-exclude-input" placeholder="გამორიცხე (მაგ: თევზი, ლაქტოზა)..." style="margin:0;">
                         <button class="secondary sm" onclick="saveDietaryFilters()">შენახვა</button>
                     </div>
-                    <!-- Day Pills for 7-day plan -->
                     <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:8px;" id="planner-day-pills"></div>
                     <div id="planner-active-day-content"></div>
                     <button class="secondary" style="width:100%; margin-top:8px;" onclick="addCurrentDayMealsToTodayLog()">+ ამ დღის კვების დღიურში გადმოტანა</button>
                 </div>
 
-                <!-- Automated Weekly Grocery List (ნაწილი 2) -->
+                <!-- Automated Weekly Grocery List -->
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <h2>🛒 კვირის საყიდლების სია (<span id="grocery-total-price">0</span> ₾)</h2>
@@ -407,7 +411,7 @@
                     <div id="food-search-results" style="max-height: 140px; overflow-y: auto; margin-bottom: 6px;"></div>
                 </div>
 
-                <!-- Recipe Library (ნაწილი 7) -->
+                <!-- Recipe Library -->
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <h2>📖 რეცეპტების ბიბლიოთეკა</h2>
@@ -448,7 +452,7 @@
                 </div>
             </div>
 
-            <!-- TAB 3: WORKOUT PRO 2.0 (ნაწილი 4) -->
+            <!-- TAB 3: WORKOUT PRO 2.0 -->
             <div id="tab-workout" class="tab-content">
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -459,7 +463,6 @@
                             <option value="advanced">Advanced</option>
                         </select>
                     </div>
-                    <!-- Workout splits -->
                     <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:10px;">
                         <button class="split-pill active" onclick="selectWorkoutSplit('legs', this)">🦵 ფეხები/მუცელი</button>
                         <button class="split-pill" onclick="selectWorkoutSplit('push', this)">🏋️ Push (მკერდი/ტრიც.)</button>
@@ -468,7 +471,6 @@
                     </div>
                     <div id="split-workout-details" style="font-size:12px; color:var(--text-muted); line-height:1.6; margin-bottom:10px;"></div>
 
-                    <!-- Rest timer with background-safe date calculation -->
                     <div style="background:rgba(255,255,255,0.03); border:1px solid var(--glass-border); border-radius:14px; padding:10px; margin-bottom:10px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                             <span style="font-size:11px; font-weight:700; color:var(--warning);">⏱️ სეტებს შორის დასვენების ტაიმერი:</span>
@@ -484,7 +486,6 @@
                     </div>
                 </div>
 
-                <!-- Log exercise sets with PR Detection & Overload Tip -->
                 <div class="card">
                     <h2>ვარჯიშის ჟურნალი & რეკორდები (PR)</h2>
                     <div class="flex-row">
@@ -498,9 +499,8 @@
                 </div>
             </div>
 
-            <!-- TAB 4: MISSIONS, HABITS & SLEEP (ნაწილები 3 & 8) -->
+            <!-- TAB 4: MISSIONS, HABITS & SLEEP -->
             <div id="tab-habits" class="tab-content">
-                <!-- Daily Missions & Fitness Quest (ნაწილი 3) -->
                 <div class="card" style="border-color: rgba(139,92,246,0.3);">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <h2>🎯 დღიური მისიები & Quest</h2>
@@ -509,17 +509,14 @@
                     <div id="daily-missions-container"></div>
                 </div>
 
-                <!-- Habit Calendar & Monthly Heatmap (ნაწილი 8) -->
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                         <h2>📅 ჩვევების თვიური კალენდარი (Heatmap)</h2>
-                        <button class="secondary sm" onclick="openCustomHabitModal()">+ ჩვევა</button>
                     </div>
                     <div class="heatmap-grid" id="habit-heatmap-grid"></div>
                     <div id="user-habits-checklist" style="margin-top:12px;"></div>
                 </div>
 
-                <!-- Sleep Tracker (ნაწილი 8) -->
                 <div class="card">
                     <h2>🌙 ძილის ტრეკერი & ხარისხი</h2>
                     <div class="flex-row" style="margin-bottom:8px;">
@@ -543,9 +540,8 @@
                 </div>
             </div>
 
-            <!-- TAB 5: SOCIAL, FRIENDS & LEADERBOARD (ნაწილები 5 & 10) -->
+            <!-- TAB 5: SOCIAL, FRIENDS & LEADERBOARD -->
             <div id="tab-social" class="tab-content">
-                <!-- Direct Coach Chat -->
                 <div class="card" style="border-color: rgba(139,92,246,0.3);">
                     <h2>პირდაპირი ჩატი მწვრთნელთან</h2>
                     <div class="chat-container" id="chat-box"></div>
@@ -555,7 +551,6 @@
                     </div>
                 </div>
 
-                <!-- Friends System (ნაწილი 5) -->
                 <div class="card">
                     <h2>👥 მეგობრების სისტემა</h2>
                     <div class="flex-row" style="margin-bottom:8px;">
@@ -566,7 +561,6 @@
                     <div id="friends-list-container" style="margin-top:8px;"></div>
                 </div>
 
-                <!-- 7-Day Activity Leaderboard (ნაწილი 5) -->
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <h2>🏆 კვირის XP & ნაბიჯების რეიტინგი</h2>
@@ -575,7 +569,6 @@
                     <div id="leaderboard-container"></div>
                 </div>
 
-                <!-- Referral & Rewards (ნაწილი 10) -->
                 <div class="card">
                     <h2>🎁 მოიწვიე მეგობარი & მიიღე XP</h2>
                     <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:8px;">გაუზიარე შენი პირადი კოდი მეგობარს. რეგისტრაციისას კოდის მითითების შემდეგ ორივე მიიღებთ +100 XP-ს!</p>
@@ -587,7 +580,7 @@
                 </div>
             </div>
 
-            <!-- TAB 6: ADVANCED ANALYTICS & REPORTS (ნაწილი 9) -->
+            <!-- TAB 6: ADVANCED ANALYTICS & REPORTS -->
             <div id="tab-analytics" class="tab-content">
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -607,7 +600,6 @@
                     <canvas id="analyticsWeightChart" height="120"></canvas>
                 </div>
 
-                <!-- Body Measurements & Before/After Slider -->
                 <div class="card">
                     <h2>📸 Before & After ტრანსფორმაცია</h2>
                     <div class="before-after-container">
@@ -625,7 +617,7 @@
                 </div>
             </div>
 
-            <!-- TAB 7: ADMIN PORTAL 2.0 (ნაწილი 11 — nikkaburnadzee@gmail.com) -->
+            <!-- TAB 7: ADMIN PORTAL 2.0 (nikkaburnadzee@gmail.com) -->
             <div id="tab-admin" class="tab-content">
                 <div class="card" style="border-color:var(--accent);">
                     <h2 style="color:var(--accent);">👑 ადმინ პორტალი 2.0</h2>
@@ -641,7 +633,6 @@
                     </div>
                 </div>
 
-                <!-- Global Broadcast Announcement -->
                 <div class="card">
                     <h2>📢 გლობალური ბანერი (ყველა კლიენტს)</h2>
                     <input type="text" id="admin-broadcast-input" placeholder="მაგ: დღეს 20:00-ზე პირდაპირი ეთერი!">
@@ -651,7 +642,6 @@
                     </div>
                 </div>
 
-                <!-- Client Goals & Chat -->
                 <div class="card">
                     <h2>🎯 კლიენტის მიზნების რედაქტირება & ჩატი</h2>
                     <select id="admin-user-dropdown" onchange="loadAdminChatWithUser(this.value)"></select>
@@ -670,13 +660,11 @@
                     </div>
                 </div>
 
-                <!-- Monitored Users List -->
                 <div class="card">
                     <h2>მომხმარებელთა ცოცხალი მონიტორინგი</h2>
                     <div id="admin-user-list"></div>
                 </div>
 
-                <!-- Audit Log & Backup -->
                 <div class="card">
                     <h2>უსაფრთხოება & Backup</h2>
                     <button class="secondary" style="width:100%;" onclick="backupClientData()">📥 ბაზის სრული Backup (JSON)</button>
@@ -685,7 +673,16 @@
         </div>
     </div>
 
-    <!-- AI Bot Floating Button & Modal -->
+    <nav id="app-nav" class="bottom-nav" style="display:none" aria-label="მთავარი ნავიგაცია">
+<button class="nav-btn active" onclick="switchTab('dashboard',this)">🏠<span>მთავარი</span></button>
+<button class="nav-btn" onclick="switchTab('diet',this)">🥗<span>კვება</span></button>
+<button class="nav-btn" onclick="switchTab('workout',this)">🏋️<span>ვარჯიში</span></button>
+<button class="nav-btn" onclick="switchTab('habits',this)">🎯<span>ჩვევები</span></button>
+<button class="nav-btn" onclick="switchTab('social',this)">💬<span>სოციუმი</span></button>
+<button class="nav-btn" onclick="switchTab('analytics',this)">📈<span>პროგრესი</span></button>
+<button class="nav-btn" id="admin-nav-btn" style="display:none" onclick="switchTab('admin',this)">👑<span>ადმინი</span></button>
+</nav>
+<!-- AI Bot Floating Button & Modal -->
     <div class="fab-ai" id="fab-ai" onclick="toggleAiModal()" style="display:none;">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2a2 2 0 0 1 2 2c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2zm0 6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6zm0 2c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/></svg>
     </div>
@@ -703,49 +700,24 @@
         </div>
     </div>
 
-    <!-- Settings & Privacy Center Modal (ნაწილები 6 & 12) -->
+    <!-- Settings Modal -->
     <div class="modal" id="settings-modal">
         <div class="modal-content">
             <h2>⚙️ პარამეტრები & Privacy Center <span style="cursor:pointer;" onclick="closeSettings()">✕</span></h2>
-            
             <label style="font-size:10.5px; color:var(--text-muted);">სახელი</label>
             <input type="text" id="set-name">
-
             <label style="font-size:10.5px; color:var(--text-muted);">პროფილის ფოტო URL</label>
             <input type="text" id="set-photo">
-
             <label style="font-size:10.5px; color:var(--text-muted);">სამიზნე წონა (კგ)</label>
             <input type="number" id="set-target-weight">
-
-            <div style="background:var(--surface); padding:10px; border-radius:12px; margin:10px 0;">
-                <h3 style="font-size:11.5px; color:var(--primary); margin-bottom:6px;">🔔 ჭკვიანი შეხსენებები (Smart Reminders)</h3>
-                <label style="font-size:11px; display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                    <input type="checkbox" id="rem-water" style="width:auto; margin:0;"> წყლის დალევის შეხსენება (2 სთ-ში ერთხელ)
-                </label>
-                <label style="font-size:11px; display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                    <input type="checkbox" id="rem-workout" style="width:auto; margin:0;"> ვარჯიშის შეხსენება
-                </label>
-                <div class="flex-row" style="margin-top:4px;">
-                    <div><label style="font-size:9.5px; color:var(--text-muted);">Quiet Hours (დან)</label><input type="time" id="rem-quiet-start" value="22:00" style="margin:0;"></div>
-                    <div><label style="font-size:9.5px; color:var(--text-muted);">Quiet Hours (მდე)</label><input type="time" id="rem-quiet-end" value="08:00" style="margin:0;"></div>
-                </div>
-            </div>
-
-            <div style="background:var(--surface); padding:10px; border-radius:12px; margin-bottom:10px;">
-                <h3 style="font-size:11.5px; color:var(--accent); margin-bottom:6px;">🔒 კონფიდენციალურობა (Privacy Center)</h3>
-                <label style="font-size:11px; display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                    <input type="checkbox" id="priv-leaderboard" style="width:auto; margin:0;"> გამოჩენა Leaderboard-ში (მხოლოდ XP)
-                </label>
-                <button class="secondary sm" style="width:100%; margin-top:4px;" onclick="exportMyUserData()">📥 ჩემი მონაცემების ექსპორტი (JSON)</button>
-            </div>
-
-            <button onclick="saveSettings()" style="width:100%; margin-top:6px;">შენახვა</button>
+            <button class="secondary sm" style="width:100%; margin-top:4px;" onclick="exportMyUserData()">📥 ჩემი მონაცემების ექსპორტი (JSON)</button>
+            <button onclick="saveSettings()" style="width:100%; margin-top:10px;">შენახვა</button>
             <button class="danger" style="width:100%; margin-top:6px;" onclick="deleteMyAccount()">ანგარიშის წაშლა 🗑️</button>
             <button class="secondary" style="width:100%; margin-top:6px;" onclick="logoutUser()">გამოსვლა</button>
         </div>
     </div>
 
-    <!-- Dashboard Customizer Modal (ნაწილი 1) -->
+    <!-- Dashboard Customizer Modal -->
     <div class="modal" id="dash-customizer-modal">
         <div class="modal-content">
             <h2>🎨 Dashboard 2.0 მოწესრიგება <span style="cursor:pointer;" onclick="closeDashboardCustomizer()">✕</span></h2>
@@ -755,7 +727,7 @@
         </div>
     </div>
 
-    <!-- Create Custom Recipe Modal (ნაწილი 7) -->
+    <!-- Create Custom Recipe Modal -->
     <div class="modal" id="create-recipe-modal">
         <div class="modal-content">
             <h2>🥗 ახალი რეცეპტის შექმნა <span style="cursor:pointer;" onclick="closeCreateRecipeModal()">✕</span></h2>
@@ -764,45 +736,9 @@
                 <input type="number" id="cr-cal" placeholder="კკალ">
                 <input type="number" id="cr-prot" placeholder="ცილა(გ)">
             </div>
-            <div class="flex-row">
-                <input type="number" id="cr-time" placeholder="დრო (წთ)">
-                <input type="number" id="cr-price" placeholder="ფასი (₾)">
-            </div>
-            <textarea id="cr-ingr" placeholder="ინგრედიენტები (გამოყავი მძიმით)..." rows="3"></textarea>
-            <button onclick="saveNewRecipeFromModal()" style="width:100%; margin-top:8px;">რეცეპტის შენახვა</button>
+            <textarea id="cr-ingr" placeholder="ინგრედიენტები..." rows="3"></textarea>
+            <button onclick="saveNewRecipeFromModal()" style="width:100%; margin-top:8px;">შენახვა</button>
         </div>
-    </div>
-
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav" id="app-nav" style="display:none;">
-        <button class="nav-btn active" onclick="switchTab('dashboard', this)">
-            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>მთავარი</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('diet', this)">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
-            <span>კვება</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('workout', this)">
-            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            <span>ვარჯიში</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('habits', this)">
-            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <span>ჩვევები</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('social', this)">
-            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            <span>სოციალური</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('analytics', this)">
-            <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            <span>ანალიტიკა</span>
-        </button>
-        <button class="nav-btn" id="admin-nav-btn" style="display:none;" onclick="switchTab('admin', this)">
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <span>პორტალი</span>
-        </button>
     </div>
 
     <!-- MAIN JAVASCRIPT ENGINE -->
@@ -867,10 +803,22 @@
             messagingSenderId: "652240598763",
             appId: "1:652240598763:web:b064e8cbbcf854a248f0ae"
         };
-        try { firebase.initializeApp(firebaseConfig); } catch(e) {}
-        var auth = firebase.auth();
-        var db = firebase.firestore();
-
+        var auth = null;
+        var db = null;
+        function authStatus(message, error) {
+            var el = document.getElementById('auth-status');
+            if (el) { el.textContent = message; el.style.color = error ? '#fca5a5' : '#a7f3d0'; }
+            if (error) console.error('[Fitness Auth]', message);
+        }
+        try {
+            if (typeof firebase === 'undefined' || typeof firebase.auth !== 'function' || typeof firebase.firestore !== 'function') {
+                throw new Error('Firebase SDK ვერ ჩაიტვირთა. საჭიროა ინტერნეტი და ბრაუზერიდან HTTPS მისამართით გახსნა. Koder-ის ლოკალურმა preview-მ შესაძლოა Firebase დაბლოკოს.');
+            }
+            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
+            authStatus('Firebase ჩაიტვირთა. შეიყვანე ელფოსტა და პაროლი.', false);
+        } catch(e) { authStatus('Firebase-ის ინიციალიზაციის შეცდომა: ' + e.message, true); }
         var currentUser = null;
         var selectedAdminUserUid = null;
 
@@ -917,8 +865,6 @@
             customRecipes: [],
             excludedIngredients: [],
             dashboardConfig: { hiddenCards: [] },
-            privacySettings: { showInLeaderboard: true },
-            reminderSettings: { water: true, workout: true, quietStart: "22:00", quietEnd: "08:00" },
             referralCode: "",
             referredCount: 0,
             beforeImg: "",
@@ -988,9 +934,7 @@
 
         function generate7DayMealPlan() {
             var goal = userDocData.goalCal || 2000;
-            var excluded = userDocData.excludedIngredients || [];
             var days = ["ორშაბათი", "სამშაბათი", "ოთხშაბათი", "ხუთშაბათი", "პარასკევი", "შაბათი", "კვირა"];
-            
             var bRatio = 0.25, lRatio = 0.35, sRatio = 0.15, dRatio = 0.25;
 
             weeklyMealPlan = {};
@@ -1031,7 +975,7 @@
         function renderMealItemRow(title, item, slot) {
             return '<div style="border-bottom:1px solid var(--glass-border); padding:8px 0; display:flex; justify-content:space-between; align-items:center;">' +
                 '<div><b>' + title + ':</b> ' + item.name + '<br><span style="font-size:11px; color:var(--text-muted);">' + item.cal + ' კკალ | ' + item.prot + 'გ ცილა | ~' + item.price + ' ₾ (x' + item.portion + ')</span></div>' +
-                '<div style="display:flex; gap:4px;"><button class="secondary sm" onclick="swapMealSlot('' + slot + '')">🔄</button><button class="secondary sm" onclick="scaleMealPortion('' + slot + '')">x1.5</button></div>' +
+                '<div style="display:flex; gap:4px;"><button class="secondary sm" onclick="swapMealSlot(&quot;' + slot + '&quot;)">🔄</button><button class="secondary sm" onclick="scaleMealPortion(&quot;' + slot + '&quot;)">x1.5</button></div>' +
                 '</div>';
         }
 
@@ -1096,25 +1040,14 @@
         }
 
         function copyGroceryList() {
-            var text = "My Fitness Coach - კვირის საყიდლების სია (~" + document.getElementById('grocery-total-price').innerText + " ₾):
-";
-            text += "• ქათმის ფილე (1.5 კგ)
-• კვერცხი (20 ცალი)
-• შვრია
-• წიწიბურა/ბრინჯი
-• ხაჭო & მაწონი
-• ბოსტნეული & ხილი";
-            navigator.clipboard.writeText(text);
-            showNotification("📋 სია დაკოპირდა!");
+            var text = "My Fitness Coach - კვირის საყიდლების სია (~" + document.getElementById('grocery-total-price').innerText + " ₾):\n";
+            text += ["ქათმის ფილე (1.5 კგ)","კვერცხი (20 ცალი)","შვრია","წიწიბურა/ბრინჯი","ხაჭო & მაწონი","ბოსტნეული & ხილი"].map(function(x){return "• " + x;}).join("\n");
+            if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function(){showNotification("📋 სია დაკოპირდა!");}).catch(function(){showNotification("კოპირება ვერ მოხერხდა",true);});
+            else showNotification("ამ ბრაუზერში კოპირება მიუწვდომელია",true);
         }
 
-        function printMealPlanPDF() {
-            window.print();
-        }
-
-        function printAnalyticsReport() {
-            window.print();
-        }
+        function printMealPlanPDF() { window.print(); }
+        function printAnalyticsReport() { window.print(); }
 
         // DAILY MISSIONS ENGINE (ნაწილი 3)
         function renderDailyMissions() {
@@ -1137,7 +1070,7 @@
 
                 html += '<div class="mission-item ' + (isCompleted ? 'completed' : '') + '">' +
                     '<div><span style="font-size:12px; font-weight:600;">' + (isCompleted ? '✅ ' : '⭕ ') + m.title + '</span><br><span class="mission-xp-tag">+' + m.xp + ' XP</span></div>' +
-                    '<button class="secondary sm" onclick="toggleManualMission('' + m.id + '', ' + m.xp + ')">' + (isCompleted ? 'გაუქმება' : 'შესრულება') + '</button>' +
+                    '<button class="secondary sm" onclick="toggleManualMission(&quot;' + m.id + '&quot;, ' + m.xp + ')">' + (isCompleted ? 'გაუქმება' : 'შესრულება') + '</button>' +
                     '</div>';
             }
 
@@ -1197,25 +1130,12 @@
             if (btn) btn.classList.add('active');
 
             var splits = {
-                legs: "1. ჩაჯდომები (4x10)
-2. რუმინული წევა (3x12)
-3. ლანჯები (3x10)
-4. პლანკა (3x45 წმ)",
-                push: "1. ჟიმი წოლში (4x10)
-2. დახრილი განტელები (3x12)
-3. აზიდვები ორძელზე (3x12)
-4. ფრანგული ჟიმი (3x12)",
-                pull: "1. აზიდვა ღერძზე (4x8)
-2. შტანგის მიზიდვა (4x10)
-3. ბლოკის ჩამოწევა (3x12)
-4. ჰამერები (3x12)",
-                hiit: "1. ბარპი (4x12)
-2. მთამსვლელი (4x40 წმ)
-3. ნახტომებით ჩაჯდომა (4x15)
-4. სწრაფი სიარული (15 წთ)"
+                legs: "1. ჩაჯდომები (4x10)\n2. რუმინული წევა (3x12)\n3. ლანჯები (3x10)\n4. პლანკა (3x45 წმ)",
+                push: "1. ჟიმი წოლში (4x10)\n2. დახრილი განტელები (3x12)\n3. აზიდვები ორძელზე (3x12)\n4. ფრანგული ჟიმი (3x12)",
+                pull: "1. აზიდვა ღერძზე (4x8)\n2. შტანგის მიზიდვა (4x10)\n3. ბლოკის ჩამოწევა (3x12)\n4. ჰამერები (3x12)",
+                hiit: "1. ბარპი (4x12)\n2. მთამსვლელი (4x40 წმ)\n3. ნახტომებით ჩაჯდომა (4x15)\n4. სწრაფი სიარული (15 წთ)"
             };
-            setHtml('split-workout-details', (splits[splitKey] || '').replace(/
-/g, '<br>'));
+            setHtml('split-workout-details', (splits[splitKey] || '').replace(/\n/g, '<br>'));
         }
 
         function addWorkoutLog() {
@@ -1449,6 +1369,8 @@
             setTxt('prot-eaten', totalProt);
             setTxt('fat-eaten', totalFat);
             setTxt('carb-eaten', totalCarb);
+            setTxt('fat-goal', userDocData.goalFat || 60);
+            setTxt('carb-goal', userDocData.goalCarb || 150);
             
             var pct = Math.min(100, Math.round((totalCal / (userDocData.goalCal || 2000)) * 100));
             setTxt('cal-percent', pct + '%');
@@ -1584,101 +1506,119 @@
             draw();
         }
 
-        // FIREBASE AUTH & INIT
-        auth.onAuthStateChanged(function(user) {
+        // FIREBASE AUTH & INIT (WITH SAFE FALLBACK)
+        if (auth && db) auth.onAuthStateChanged(function(user) {
             if (user) {
                 currentUser = user;
+                
+                // Save user immediately so Admin dashboard sees all registered friends
                 db.collection('users').doc(user.uid).set({
                     email: user.email,
-                    lastActive: new Date(),
-                    emailVerified: user.emailVerified
-                }, { merge: true });
+                    lastActive: new Date()
+                }, { merge: true }).catch(function(err) { console.log(err); });
 
-                if (!user.emailVerified) {
-                    showVerifyScreen(user);
-                    return;
-                }
-                hideVerifyScreen();
-                document.getElementById('auth-screen').classList.remove('active');
+                var authScreen = document.getElementById('auth-screen');
+                if (authScreen) authScreen.classList.remove('active');
+                
+                var verifyScreen = document.getElementById('verify-screen');
+                if (verifyScreen) verifyScreen.classList.remove('active');
 
+                // Load user data safely
                 db.collection('users').doc(user.uid).get().then(function(doc) {
-                    if (doc.exists) userDocData = Object.assign(userDocData, doc.data());
+                    if (doc.exists) {
+                        userDocData = Object.assign(userDocData, doc.data());
+                    }
                     if (!userDocData.setupComplete) {
-                        document.getElementById('onboarding-screen').classList.add('active');
+                        var obScreen = document.getElementById('onboarding-screen');
+                        if (obScreen) obScreen.classList.add('active');
                     } else {
                         initApp();
                     }
+                }).catch(function(e) {
+                    console.log("Fallback init:", e);
+                    showNotification('პროფილის ჩატვირთვა ვერ მოხერხდა: ' + e.message, true);
+                document.getElementById('auth-screen').classList.add('active');
+                authStatus('ანგარიშში შესვლა მოხდა, მაგრამ Firestore პროფილის წაკითხვა ვერ მოხერხდა: ' + e.message, true);
                 });
             } else {
                 currentUser = null;
-                hideVerifyScreen();
-                document.getElementById('auth-screen').classList.add('active');
-                document.getElementById('app-container').style.display = 'none';
-                document.getElementById('app-nav').style.display = 'none';
-                document.getElementById('fab-ai').style.display = 'none';
+                var authScreen = document.getElementById('auth-screen');
+                if (authScreen) authScreen.classList.add('active');
+                var appContainer = document.getElementById('app-container');
+                if (appContainer) appContainer.style.display = 'none';
+                var appNav = document.getElementById('app-nav');
+                if (appNav) appNav.style.display = 'none';
+                var fabAi = document.getElementById('fab-ai');
+                if (fabAi) fabAi.style.display = 'none';
+                var obScreen = document.getElementById('onboarding-screen');
+                if (obScreen) obScreen.classList.remove('active');
             }
         });
-
-        function showVerifyScreen(user) {
-            document.getElementById('auth-screen').classList.remove('active');
-            document.getElementById('verify-screen').classList.add('active');
-            setTxt('unverified-email-text', user.email);
-        }
-        function hideVerifyScreen() { document.getElementById('verify-screen').classList.remove('active'); }
-
-        function checkEmailVerified() {
-            if (currentUser) {
-                currentUser.reload().then(function() {
-                    if (currentUser.emailVerified) {
-                        showNotification("✅ ელ-ფოსტა დადასტურებულია!");
-                        hideVerifyScreen();
-                        initApp();
-                    } else {
-                        showNotification("ჯერ არ არის დადასტურებული!", true);
-                    }
-                });
-            }
-        }
-
-        function resendVerificationEmail() {
-            if (currentUser) {
-                currentUser.sendEmailVerification().then(function() {
-                    showNotification("✉️ ბმული გაიგზავნა: " + currentUser.email);
-                });
-            }
-        }
 
         function loginUser() {
             var em = document.getElementById('auth-email').value.trim();
             var pw = document.getElementById('auth-password').value;
             if (!em || !pw) return showNotification("შეიყვანე Email და პაროლი!", true);
-            auth.signInWithEmailAndPassword(em, pw).catch(function(e) { showNotification("შესვლის შეცდომა: " + e.message, true); });
+            
+            if (!auth) return authStatus('შესვლა შეუძლებელია: Firebase არ ჩაიტვირთა. იხილე შეტყობინება ზემოთ.', true);
+            authStatus('მიმდინარეობს შესვლა...', false);
+            auth.signInWithEmailAndPassword(em, pw).then(function() {
+                authStatus('ავტორიზაცია წარმატებულია. იტვირთება პროფილი...', false);
+                showNotification("✅ წარმატებით შეხვედით!");
+            }).catch(function(e) { 
+                var msg = "შესვლის შეცდომა: ";
+                if (e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
+                    msg += "ელ-ფოსტა ან პაროლი არასწორია!";
+                } else if (e.code === 'auth/invalid-email') {
+                    msg += "ელ-ფოსტის ფორმატი არასწორია!";
+                } else {
+                    msg += e.message;
+                }
+                authStatus(msg + ' [' + (e.code || 'unknown') + ']', true);
+                showNotification(msg, true);
+            });
         }
 
         function registerUser() {
             var em = document.getElementById('auth-email').value.trim();
             var pw = document.getElementById('auth-password').value;
             if (!em || !pw) return showNotification("შეიყვანე Email და პაროლი!", true);
-            if (pw.length < 6) return showNotification("პაროლი უნდა იყოს მინ. 6 სიმბოლო!", true);
+            if (pw.length < 6) return showNotification("პაროლი უნდა იყოს მინიმუმ 6 სიმბოლო!", true);
 
+            if (!auth || !db) return authStatus('რეგისტრაცია შეუძლებელია: Firebase არ ჩაიტვირთა.', true);
+            authStatus('რეგისტრაცია მიმდინარეობს...', false);
+            showNotification("რეგისტრაცია მიმდინარეობს... ⏳");
             auth.createUserWithEmailAndPassword(em, pw).then(function(userCred) {
                 var u = userCred.user;
-                u.sendEmailVerification().then(function() {
-                    showNotification("✉️ ვერიფიკაციის ბმული გაიგზავნა: " + em);
-                });
-            }).catch(function(e) { showNotification("შეცდომა: " + e.message, true); });
+                return db.collection('users').doc(u.uid).set({
+                    email: em,
+                    registeredAt: new Date(),
+                    setupComplete: false,
+                    name: em.split('@')[0]
+                }, { merge: true }).then(function(){ showNotification("✅ რეგისტრაცია წარმატებულია!"); });
+            }).catch(function(e) { 
+                var msg = "რეგისტრაციის შეცდომა: ";
+                if (e.code === 'auth/email-already-in-use') {
+                    msg += "ეს ელ-ფოსტა უკვე დარეგისტრირებულია! სცადეთ 'შესვლა'.";
+                } else {
+                    msg += e.message;
+                }
+                authStatus(msg + ' [' + (e.code || 'unknown') + ']', true);
+                showNotification(msg, true);
+            });
         }
 
         function resetPassword() {
             var em = document.getElementById('auth-email').value.trim();
             if (!em) em = prompt("შეიყვანეთ ელ-ფოსტა:");
             if (!em) return;
+            if (!auth) return authStatus('Firebase არ ჩაიტვირთა.', true);
             auth.sendPasswordResetEmail(em).then(function() {
                 showNotification("✉️ აღდგენის ბმული გაიგზავნა: " + em);
-            }).catch(function(e) { showNotification(e.message, true); });
+            }).catch(function(e) { showNotification("შეცდომა: " + e.message, true); });
         }
 
-        function logoutUser() { auth.signOut(); closeSettings(); }
+        function logoutUser() { if (auth) auth.signOut(); closeSettings(); }
 
         function finishOnboarding() {
             var n = escapeHTML(document.getElementById('ob-name').value) || "კლიენტი";
@@ -1721,12 +1661,12 @@
                 document.getElementById('onboarding-screen').classList.remove('active');
                 triggerConfetti();
                 initApp();
-            });
+            }).catch(function(e){ showNotification('პროფილის შენახვა ვერ მოხერხდა: ' + e.message, true); });
         }
 
         function initApp() {
             document.getElementById('app-container').style.display = 'block';
-            document.getElementById('app-nav').style.display = 'flex';
+            var nav = document.getElementById('app-nav'); if (nav) nav.style.display = 'flex';
             document.getElementById('fab-ai').style.display = 'flex';
 
             setTxt('display-name', userDocData.name || 'მომხმარებელი');
@@ -1734,8 +1674,6 @@
             if (av) av.src = userDocData.photo;
             setTxt('cal-goal', userDocData.goalCal);
             setTxt('prot-goal', userDocData.goalProt);
-            setTxt('fat-goal', userDocData.goalFat);
-            setTxt('carb-goal', userDocData.goalCarb);
             setTxt('dash-water-goal', userDocData.waterGoal);
 
             applyDashboardVisibility();
@@ -1765,7 +1703,6 @@
                 updateUI();
             });
 
-            // Fetch yesterday for comparison
             db.collection('users').doc(currentUser.uid).collection('days').doc(yesterdayDate).get().then(function(doc) {
                 if (doc.exists) yesterdayData = doc.data();
                 updateUI();
@@ -1912,7 +1849,7 @@
                     if (u.email && u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return;
                     adminClients[doc.id] = u;
                     dropdown += '<option value="' + doc.id + '">' + escapeHTML(u.email || doc.id) + '</option>';
-                    listHtml += '<div class="list-item"><div class="item-row"><div><b>' + escapeHTML(u.email) + '</b> (' + (u.name || 'კლიენტი') + ')</div><button class="secondary sm" onclick="selectAdminClient('' + doc.id + '')">მართვა</button></div></div>';
+                    listHtml += '<div class="list-item"><div class="item-row"><div><b>' + escapeHTML(u.email) + '</b> (' + (u.name || 'კლიენტი') + ')</div><button class="secondary sm" onclick="selectAdminClient(&quot;' + doc.id + '&quot;)">მართვა</button></div></div>';
                 });
                 setHtml('admin-user-dropdown', dropdown);
                 setHtml('admin-user-list', listHtml);
