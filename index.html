@@ -156,6 +156,32 @@
             .bottom-nav, .fab-ai, .quick-actions-bar, button, .modal { display: none !important; }
             .card { background: #fff; border: 1px solid #ccc; box-shadow: none; color: #000; }
         }
+
+        /* Premium 2026 interface — no external icon dependency */
+        :root { --bg:#090e13; --bg-grad:linear-gradient(155deg,#0b1118 0%,#101a20 55%,#0a1015 100%); --glass-bg:rgba(19,30,36,.93); --glass-border:rgba(174,217,198,.11); --primary:#39dfad; --primary-glow:rgba(57,223,173,.16); --accent:#73bca9; --accent-glow:rgba(115,188,169,.16); --text:#f0f7f4; --text-muted:#a0b3ad; --surface:rgba(220,255,239,.045); --card-radius:22px; }
+        body {letter-spacing:-.1px;}
+        .container {padding:18px 16px 24px;}
+        .card {box-shadow:0 8px 28px rgba(0,0,0,.13);border-radius:22px;padding:19px;}
+        h2 {font-size:12px;letter-spacing:1px;}
+        .stat-box {background:rgba(255,255,255,.025);border-radius:18px;padding:16px 12px;}
+        .stat-val {font-size:23px;letter-spacing:-.7px;}
+        button {border-radius:13px;min-height:42px;box-shadow:none;text-transform:none;letter-spacing:.1px;font-size:12.5px;}
+        button:not(.nav-btn):not(.secondary):not(.danger):not(.warning):not(.accent) {color:#08221b;}
+        button:focus-visible,input:focus-visible,select:focus-visible {outline:2px solid var(--primary);outline-offset:2px;}
+        input,select,textarea {background:rgba(255,255,255,.035);border-radius:13px;padding:14px;}
+        .bottom-nav {left:10px;right:10px;width:auto;bottom:max(9px,env(safe-area-inset-bottom));padding:11px 4px 9px;border:1px solid rgba(154,213,190,.16);border-radius:21px;background:rgba(13,23,28,.96);box-shadow:0 12px 35px rgba(0,0,0,.35);justify-content:space-evenly;gap:1px;}
+        .nav-btn {flex:1;min-width:0;gap:5px;padding:7px 1px 5px;line-height:1.2;font-size:9px;border-radius:12px;transform:none!important;}
+        .nav-btn svg {width:21px;height:21px;stroke-width:1.8;flex-shrink:0;}
+        .nav-btn.active {background:rgba(57,223,173,.10);color:var(--primary);}
+        .nav-btn span {white-space:nowrap;}
+        .fab-ai {background:var(--primary);box-shadow:0 8px 25px rgba(57,223,173,.2);bottom:105px;}
+        .fab-ai svg {stroke:#09221b;}
+        .modal-content {background:#121d22;border-radius:25px;}
+        .full-screen {background:var(--bg-grad);}
+        .user-level {color:var(--primary);}
+        .quote-box {background:rgba(57,223,173,.07);border-left-color:var(--primary);color:#b6e6d6;}
+        @media (max-width:365px) {.nav-btn{font-size:8px}.nav-btn svg{width:19px;height:19px}.bottom-nav{left:5px;right:5px}}
+        @media (prefers-reduced-motion:reduce) {*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     </style>
 </head>
 <body>
@@ -168,7 +194,7 @@
     <!-- Global Broadcast Banner -->
     <div id="broadcast-banner" class="container" style="padding-bottom: 0;">
         <div class="broadcast-banner" id="broadcast-inner">
-            <span id="broadcast-text">📢 <b>მწვრთნელის განცხადება:</b> ...</span>
+            <span id="broadcast-text"> <b>მწვრთნელის განცხადება:</b> ...</span>
             <button class="secondary" style="padding:4px 8px; font-size:10px; width:auto; border-radius:8px;" onclick="dismissBroadcast()">✕</button>
         </div>
     </div>
@@ -202,10 +228,10 @@
     </div>
 
     <!-- Email Verification Guard Screen (Deprecated but kept for structure) -->
-    <div id="verify-screen" class="full-screen" style="justify-content: center; align-items: center; display:none;">
+    <div id="verify-screen" class="full-screen" style="justify-content: center; align-items: center;">
         <div class="card" style="width: 100%; max-width: 380px; text-align: center; padding: 28px 20px;">
             <h1 style="font-size: 19px; margin-bottom: 8px;">დაადასტურეთ ელ-ფოსტა</h1>
-            <button onclick="checkEmailVerified()" style="width:100%; margin-bottom:8px;">დავადასტურე (შემოწმება) 🔄</button>
+            <p id="verify-email-label" style="font-size:12px;margin-bottom:12px;"></p><p id="verify-status" role="status" style="font-size:12px;margin-bottom:12px;"></p><button onclick="checkEmailVerified()" style="width:100%;margin-bottom:8px;">ელფოსტა დავადასტურე — შემოწმება</button><button class="secondary" onclick="resendVerificationEmail()" style="width:100%;margin-bottom:8px;">წერილის ხელახლა გაგზავნა</button><button class="secondary" onclick="logoutUser()" style="width:100%;">სხვა ანგარიშით შესვლა</button>
         </div>
     </div>
 
@@ -260,7 +286,7 @@
             <h2>მოწვევის კოდი (Referral Code - სურვილისამებრ)</h2>
             <input type="text" id="ob-refcode" placeholder="კოდი თუ გაქვს">
 
-            <button onclick="finishOnboarding()" style="margin-top: 14px;">პროფილის შენახვა 🚀</button>
+            <button onclick="finishOnboarding()" style="margin-top: 14px;">პროფილის შენახვა </button>
         </div>
     </div>
 
@@ -278,8 +304,8 @@
                     </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:6px;">
-                    <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:5px 10px; border-radius:12px; font-size:11.5px; font-weight:800; color:var(--warning);" id="streak-badge">🔥 1 დღე</div>
-                    <button class="secondary" style="padding:8px; border-radius:12px; width:auto;" onclick="openSettings()">⚙️</button>
+                    <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:5px 10px; border-radius:12px; font-size:11.5px; font-weight:800; color:var(--warning);" id="streak-badge"> 1 დღე</div>
+                    <button class="secondary" style="padding:8px; border-radius:12px; width:auto;" onclick="openSettings()"></button>
                 </div>
             </div>
 
@@ -288,11 +314,11 @@
 
             <!-- Quick Actions Bar -->
             <div class="quick-actions-bar">
-                <div class="quick-btn" onclick="quickActionAddFood()">🥗 + საკვები</div>
-                <div class="quick-btn" onclick="addWater(250)">💧 +250მლ წყალი</div>
-                <div class="quick-btn" onclick="quickActionLogWeight()">⚖️ წონა</div>
-                <div class="quick-btn" onclick="switchTab('workout', null)">🏋️ ვარჯიში</div>
-                <div class="quick-btn" onclick="openDashboardCustomizer()">🎨 მოწესრიგება</div>
+                <div class="quick-btn" onclick="quickActionAddFood()"> + საკვები</div>
+                <div class="quick-btn" onclick="addWater(250)"> +250მლ წყალი</div>
+                <div class="quick-btn" onclick="quickActionLogWeight()"> წონა</div>
+                <div class="quick-btn" onclick="switchTab('workout', null)"> ვარჯიში</div>
+                <div class="quick-btn" onclick="openDashboardCustomizer()"> მოწესრიგება</div>
             </div>
 
             <!-- TAB 1: SMART DASHBOARD 2.0 -->
@@ -380,10 +406,10 @@
             <div id="tab-diet" class="tab-content">
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <h2>📅 7-დღიანი პერსონალური მენიუ</h2>
+                        <h2> 7-დღიანი პერსონალური მენიუ</h2>
                         <div style="display:flex; gap:6px;">
-                            <button class="secondary sm" onclick="printMealPlanPDF()">🖨️ PDF</button>
-                            <button class="sm" onclick="generate7DayMealPlan()">🔄 გენერაცია</button>
+                            <button class="secondary sm" onclick="printMealPlanPDF()"> PDF</button>
+                            <button class="sm" onclick="generate7DayMealPlan()"> გენერაცია</button>
                         </div>
                     </div>
                     <div class="flex-row" style="margin-bottom:8px;">
@@ -398,8 +424,8 @@
                 <!-- Automated Weekly Grocery List -->
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <h2>🛒 კვირის საყიდლების სია (<span id="grocery-total-price">0</span> ₾)</h2>
-                        <button class="secondary sm" onclick="copyGroceryList()">📋 კოპირება</button>
+                        <h2> კვირის საყიდლების სია (<span id="grocery-total-price">0</span> ₾)</h2>
+                        <button class="secondary sm" onclick="copyGroceryList()"> კოპირება</button>
                     </div>
                     <div id="grocery-items-container"></div>
                 </div>
@@ -414,7 +440,7 @@
                 <!-- Recipe Library -->
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <h2>📖 რეცეპტების ბიბლიოთეკა</h2>
+                        <h2> რეცეპტების ბიბლიოთეკა</h2>
                         <button class="secondary sm" onclick="openCreateRecipeModal()">+ შექმნა</button>
                     </div>
                     <div class="flex-row" style="margin-bottom:8px;">
@@ -442,9 +468,9 @@
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <h2>დღეს ნაჭამი <span id="food-count" style="color:var(--primary); font-size:11px;"></span></h2>
-                        <button class="danger sm" onclick="clearAllFoods()">გასუფთავება 🗑️</button>
+                        <button class="danger sm" onclick="clearAllFoods()">გასუფთავება </button>
                     </div>
-                    <button class="secondary" onclick="copyYesterdayFoods()" style="font-size:11px; margin-bottom:8px; padding:6px; width:100%;">წინა დღის კოპირება 📋</button>
+                    <button class="secondary" onclick="copyYesterdayFoods()" style="font-size:11px; margin-bottom:8px; padding:6px; width:100%;">წინა დღის კოპირება </button>
                     <div id="food-list-breakfast"><h3>საუზმე</h3></div>
                     <div id="food-list-lunch"><h3>სადილი</h3></div>
                     <div id="food-list-snack"><h3>წახემსება</h3></div>
@@ -464,16 +490,16 @@
                         </select>
                     </div>
                     <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:10px;">
-                        <button class="split-pill active" onclick="selectWorkoutSplit('legs', this)">🦵 ფეხები/მუცელი</button>
-                        <button class="split-pill" onclick="selectWorkoutSplit('push', this)">🏋️ Push (მკერდი/ტრიც.)</button>
-                        <button class="split-pill" onclick="selectWorkoutSplit('pull', this)">🚣 Pull (ზურგი/ბიც.)</button>
-                        <button class="split-pill" onclick="selectWorkoutSplit('hiit', this)">🔥 HIIT & კარდიო</button>
+                        <button class="split-pill active" onclick="selectWorkoutSplit('legs', this)"> ფეხები/მუცელი</button>
+                        <button class="split-pill" onclick="selectWorkoutSplit('push', this)"> Push (მკერდი/ტრიც.)</button>
+                        <button class="split-pill" onclick="selectWorkoutSplit('pull', this)"> Pull (ზურგი/ბიც.)</button>
+                        <button class="split-pill" onclick="selectWorkoutSplit('hiit', this)"> HIIT & კარდიო</button>
                     </div>
                     <div id="split-workout-details" style="font-size:12px; color:var(--text-muted); line-height:1.6; margin-bottom:10px;"></div>
 
                     <div style="background:rgba(255,255,255,0.03); border:1px solid var(--glass-border); border-radius:14px; padding:10px; margin-bottom:10px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                            <span style="font-size:11px; font-weight:700; color:var(--warning);">⏱️ სეტებს შორის დასვენების ტაიმერი:</span>
+                            <span style="font-size:11px; font-weight:700; color:var(--warning);"> სეტებს შორის დასვენების ტაიმერი:</span>
                             <span id="rest-timer-countdown" style="font-weight:800; color:var(--warning); font-size:13px;"></span>
                         </div>
                         <div class="flex-row">
@@ -494,7 +520,7 @@
                         <input type="number" id="wo-reps" placeholder="გამეორ." style="margin:0; flex:1;">
                         <input type="number" id="wo-weight" placeholder="კგ" style="margin:0; flex:1;">
                     </div>
-                    <button class="secondary" style="width:100%; margin-top:8px;" onclick="addWorkoutLog()">ვარჯიშის ჩაწერა 💪</button>
+                    <button class="secondary" style="width:100%; margin-top:8px;" onclick="addWorkoutLog()">ვარჯიშის ჩაწერა </button>
                     <div id="workout-log-list" style="margin-top:10px;"></div>
                 </div>
             </div>
@@ -503,7 +529,7 @@
             <div id="tab-habits" class="tab-content">
                 <div class="card" style="border-color: rgba(139,92,246,0.3);">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <h2>🎯 დღიური მისიები & Quest</h2>
+                        <h2> დღიური მისიები & Quest</h2>
                         <span id="missions-progress-text" style="font-size:11px; font-weight:800; color:var(--accent);">0/4 შესრულებული</span>
                     </div>
                     <div id="daily-missions-container"></div>
@@ -511,31 +537,31 @@
 
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                        <h2>📅 ჩვევების თვიური კალენდარი (Heatmap)</h2>
+                        <h2> ჩვევების თვიური კალენდარი (Heatmap)</h2>
                     </div>
                     <div class="heatmap-grid" id="habit-heatmap-grid"></div>
                     <div id="user-habits-checklist" style="margin-top:12px;"></div>
                 </div>
 
                 <div class="card">
-                    <h2>🌙 ძილის ტრეკერი & ხარისხი</h2>
+                    <h2> ძილის ტრეკერი & ხარისხი</h2>
                     <div class="flex-row" style="margin-bottom:8px;">
                         <div>
                             <label style="font-size:10.5px; color:var(--text-muted);">ხანგრძლივობა (სთ)</label>
                             <input type="number" id="sleep-hours-inp" step="0.5" placeholder="მაგ: 7.5" style="margin:0;">
                         </div>
                         <div>
-                            <label style="font-size:10.5px; color:var(--text-muted);">ხარისხი (1-5 ⭐)</label>
+                            <label style="font-size:10.5px; color:var(--text-muted);">ხარისხი (1-5 )</label>
                             <select id="sleep-quality-select" style="margin:0;">
-                                <option value="5">⭐⭐⭐⭐⭐ შესანიშნავი</option>
-                                <option value="4">⭐⭐⭐⭐ კარგი</option>
-                                <option value="3">⭐⭐⭐ საშუალო</option>
-                                <option value="2">⭐⭐ ცუდი</option>
-                                <option value="1">⭐ უძილობა</option>
+                                <option value="5"> შესანიშნავი</option>
+                                <option value="4"> კარგი</option>
+                                <option value="3"> საშუალო</option>
+                                <option value="2"> ცუდი</option>
+                                <option value="1"> უძილობა</option>
                             </select>
                         </div>
                     </div>
-                    <button class="secondary" style="width:100%;" onclick="saveSleepLog()">ძილის შენახვა 💤</button>
+                    <button class="secondary" style="width:100%;" onclick="saveSleepLog()">ძილის შენახვა </button>
                     <div id="sleep-stats-display" style="font-size:11.5px; color:var(--text-muted); margin-top:8px;">საშუალო ძილი: -- სთ</div>
                 </div>
             </div>
@@ -547,12 +573,12 @@
                     <div class="chat-container" id="chat-box"></div>
                     <div class="flex-row">
                         <input type="text" id="chat-input" placeholder="მიწერე მწვრთნელს..." style="margin:0;" onkeypress="if(event.key==='Enter') sendMessage()">
-                        <button class="accent sm" onclick="sendMessage()">📩</button>
+                        <button class="accent sm" onclick="sendMessage()"></button>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h2>👥 მეგობრების სისტემა</h2>
+                    <h2> მეგობრების სისტემა</h2>
                     <div class="flex-row" style="margin-bottom:8px;">
                         <input type="text" id="friend-search-input" placeholder="მოძებნე Username-ით..." style="margin:0;">
                         <button class="sm" onclick="sendFriendRequest()">დამატება</button>
@@ -563,18 +589,18 @@
 
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <h2>🏆 კვირის XP & ნაბიჯების რეიტინგი</h2>
+                        <h2> კვირის XP & ნაბიჯების რეიტინგი</h2>
                         <span style="font-size:10px; color:var(--primary);">ნებაყოფლობითი</span>
                     </div>
                     <div id="leaderboard-container"></div>
                 </div>
 
                 <div class="card">
-                    <h2>🎁 მოიწვიე მეგობარი & მიიღე XP</h2>
+                    <h2> მოიწვიე მეგობარი & მიიღე XP</h2>
                     <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:8px;">გაუზიარე შენი პირადი კოდი მეგობარს. რეგისტრაციისას კოდის მითითების შემდეგ ორივე მიიღებთ +100 XP-ს!</p>
                     <div class="flex-row">
                         <input type="text" id="my-referral-code" readonly style="margin:0; font-weight:800; color:var(--accent);">
-                        <button class="secondary sm" onclick="copyReferralLink()">კოპირება 🔗</button>
+                        <button class="secondary sm" onclick="copyReferralLink()">კოპირება </button>
                     </div>
                     <div id="referrals-count-display" style="font-size:11px; color:var(--text-muted); margin-top:6px;">მოწვეული მეგობრები: 0</div>
                 </div>
@@ -584,8 +610,8 @@
             <div id="tab-analytics" class="tab-content">
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <h2>📈 ანალიტიკა & ტენდენციები</h2>
-                        <button class="secondary sm" onclick="printAnalyticsReport()">🖨️ რეპორტი</button>
+                        <h2> ანალიტიკა & ტენდენციები</h2>
+                        <button class="secondary sm" onclick="printAnalyticsReport()"> რეპორტი</button>
                     </div>
                     <div class="stat-grid" style="margin-bottom:10px;">
                         <div class="stat-box">
@@ -601,12 +627,12 @@
                 </div>
 
                 <div class="card">
-                    <h2>📸 Before & After ტრანსფორმაცია</h2>
+                    <h2> Before & After ტრანსფორმაცია</h2>
                     <div class="before-after-container">
                         <img src="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600" class="ba-image" id="ba-img-before" alt="Before">
                         <img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600" class="ba-image ba-after" id="ba-img-after" alt="After">
                         <div class="ba-line" id="ba-line"></div>
-                        <div class="ba-button" id="ba-btn">↔</div>
+                        <div class="ba-button" id="ba-btn"></div>
                         <input type="range" min="0" max="100" value="50" class="ba-slider" oninput="handleBaSlider(this.value)">
                     </div>
                     <div class="flex-row" style="margin-top:8px;">
@@ -620,7 +646,7 @@
             <!-- TAB 7: ADMIN PORTAL 2.0 (nikkaburnadzee@gmail.com) -->
             <div id="tab-admin" class="tab-content">
                 <div class="card" style="border-color:var(--accent);">
-                    <h2 style="color:var(--accent);">👑 ადმინ პორტალი 2.0</h2>
+                    <h2 style="color:var(--accent);"> ადმინ პორტალი 2.0</h2>
                     <div class="stat-grid" style="margin-bottom:8px;">
                         <div class="stat-box">
                             <div class="stat-val" id="admin-total-users">0</div>
@@ -634,7 +660,7 @@
                 </div>
 
                 <div class="card">
-                    <h2>📢 გლობალური ბანერი (ყველა კლიენტს)</h2>
+                    <h2> გლობალური ბანერი (ყველა კლიენტს)</h2>
                     <input type="text" id="admin-broadcast-input" placeholder="მაგ: დღეს 20:00-ზე პირდაპირი ეთერი!">
                     <div class="flex-row">
                         <button class="accent sm" onclick="sendGlobalBroadcast()">გაგზავნა</button>
@@ -643,7 +669,7 @@
                 </div>
 
                 <div class="card">
-                    <h2>🎯 კლიენტის მიზნების რედაქტირება & ჩატი</h2>
+                    <h2> კლიენტის მიზნების რედაქტირება & ჩატი</h2>
                     <select id="admin-user-dropdown" onchange="loadAdminChatWithUser(this.value)"></select>
                     <div id="admin-client-edit-box" style="display:none; background:var(--surface); padding:10px; border-radius:12px; margin-bottom:8px;">
                         <div class="flex-row">
@@ -651,7 +677,7 @@
                             <div><label style="font-size:10px;">ცილა(გ)</label><input type="number" id="adm-edit-prot" style="margin:0;"></div>
                             <div><label style="font-size:10px;">წყალი(მლ)</label><input type="number" id="adm-edit-water" style="margin:0;"></div>
                         </div>
-                        <button class="sm" style="width:100%; margin-top:6px;" onclick="saveClientGoalsFromAdmin()">განახლება 💾</button>
+                        <button class="sm" style="width:100%; margin-top:6px;" onclick="saveClientGoalsFromAdmin()">განახლება </button>
                     </div>
                     <div class="chat-container" id="admin-chat-box"></div>
                     <div class="flex-row">
@@ -667,20 +693,20 @@
 
                 <div class="card">
                     <h2>უსაფრთხოება & Backup</h2>
-                    <button class="secondary" style="width:100%;" onclick="backupClientData()">📥 ბაზის სრული Backup (JSON)</button>
+                    <button class="secondary" style="width:100%;" onclick="backupClientData()"> ბაზის სრული Backup (JSON)</button>
                 </div>
             </div>
         </div>
     </div>
 
     <nav id="app-nav" class="bottom-nav" style="display:none" aria-label="მთავარი ნავიგაცია">
-<button class="nav-btn active" onclick="switchTab('dashboard',this)">🏠<span>მთავარი</span></button>
-<button class="nav-btn" onclick="switchTab('diet',this)">🥗<span>კვება</span></button>
-<button class="nav-btn" onclick="switchTab('workout',this)">🏋️<span>ვარჯიში</span></button>
-<button class="nav-btn" onclick="switchTab('habits',this)">🎯<span>ჩვევები</span></button>
-<button class="nav-btn" onclick="switchTab('social',this)">💬<span>სოციუმი</span></button>
-<button class="nav-btn" onclick="switchTab('analytics',this)">📈<span>პროგრესი</span></button>
-<button class="nav-btn" id="admin-nav-btn" style="display:none" onclick="switchTab('admin',this)">👑<span>ადმინი</span></button>
+<button class="nav-btn active" onclick="switchTab('dashboard',this)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-7H9v7H3z"/></svg><span>მთავარი</span></button>
+<button class="nav-btn" onclick="switchTab('diet',this)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3v8a4 4 0 0 0 8 0V3M8 3v18M17 3v18M17 3c4 3 4 8 0 10"/></svg><span>კვება</span></button>
+<button class="nav-btn" onclick="switchTab('workout',this)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6m3-9v12m3-9v6m6-6v6m3-9v12m3-9v6M3 12h18"/></svg><span>ვარჯიში</span></button>
+<button class="nav-btn" onclick="switchTab('habits',this)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9M12 7v5l3 2"/></svg><span>ჩვევები</span></button>
+<button class="nav-btn" onclick="switchTab('social',this)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8A8.5 8.5 0 0 1 12.5 20a8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 12.5 3h.5a8.5 8.5 0 0 1 8 8z"/></svg><span>სოციუმი</span></button>
+<button class="nav-btn" onclick="switchTab('analytics',this)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V12m5 8V7m5 13v-5m5 5V4"/></svg><span>პროგრესი</span></button>
+<button class="nav-btn" id="admin-nav-btn" style="display:none" onclick="switchTab('admin',this)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8l5 4 5-8 5 8 5-4-2 12H4z"/></svg><span>ადმინი</span></button>
 </nav>
 <!-- AI Bot Floating Button & Modal -->
     <div class="fab-ai" id="fab-ai" onclick="toggleAiModal()" style="display:none;">
@@ -689,9 +715,9 @@
 
     <div class="modal" id="ai-modal">
         <div class="modal-content">
-            <h2 style="color:var(--accent);">🤖 AI ქოუჩი & მეგობარი <span style="cursor:pointer;" onclick="toggleAiModal()">✕</span></h2>
+            <h2 style="color:var(--accent);"> AI ქოუჩი & მეგობარი <span style="cursor:pointer;" onclick="toggleAiModal()">✕</span></h2>
             <div class="chat-container" id="ai-chat-box" style="height:260px; background:var(--surface); padding:10px; border-radius:14px;">
-                <div class="msg-bubble coach">გაუმარჯოს! მე შენი პირადი AI ქოუჩი და მეგობარი ვარ. მკითხე აბსოლუტურად ყველაფერი — კალორიები, ვარჯიში, დიეტა, თუ უბრალოდ მოტივაცია გჭირდება! 👊</div>
+                <div class="msg-bubble coach">გაუმარჯოს! მე შენი პირადი AI ქოუჩი და მეგობარი ვარ. მკითხე აბსოლუტურად ყველაფერი — კალორიები, ვარჯიში, დიეტა, თუ უბრალოდ მოტივაცია გჭირდება! </div>
             </div>
             <div class="flex-row">
                 <input type="text" id="ai-input" placeholder="მკითხე ყველაფერი..." style="margin:0;" onkeypress="if(event.key==='Enter') askAi()">
@@ -703,16 +729,16 @@
     <!-- Settings Modal -->
     <div class="modal" id="settings-modal">
         <div class="modal-content">
-            <h2>⚙️ პარამეტრები & Privacy Center <span style="cursor:pointer;" onclick="closeSettings()">✕</span></h2>
+            <h2> პარამეტრები & Privacy Center <span style="cursor:pointer;" onclick="closeSettings()">✕</span></h2>
             <label style="font-size:10.5px; color:var(--text-muted);">სახელი</label>
             <input type="text" id="set-name">
             <label style="font-size:10.5px; color:var(--text-muted);">პროფილის ფოტო URL</label>
             <input type="text" id="set-photo">
             <label style="font-size:10.5px; color:var(--text-muted);">სამიზნე წონა (კგ)</label>
             <input type="number" id="set-target-weight">
-            <button class="secondary sm" style="width:100%; margin-top:4px;" onclick="exportMyUserData()">📥 ჩემი მონაცემების ექსპორტი (JSON)</button>
+            <button class="secondary sm" style="width:100%; margin-top:4px;" onclick="exportMyUserData()"> ჩემი მონაცემების ექსპორტი (JSON)</button>
             <button onclick="saveSettings()" style="width:100%; margin-top:10px;">შენახვა</button>
-            <button class="danger" style="width:100%; margin-top:6px;" onclick="deleteMyAccount()">ანგარიშის წაშლა 🗑️</button>
+            <button class="danger" style="width:100%; margin-top:6px;" onclick="deleteMyAccount()">ანგარიშის წაშლა </button>
             <button class="secondary" style="width:100%; margin-top:6px;" onclick="logoutUser()">გამოსვლა</button>
         </div>
     </div>
@@ -720,7 +746,7 @@
     <!-- Dashboard Customizer Modal -->
     <div class="modal" id="dash-customizer-modal">
         <div class="modal-content">
-            <h2>🎨 Dashboard 2.0 მოწესრიგება <span style="cursor:pointer;" onclick="closeDashboardCustomizer()">✕</span></h2>
+            <h2> Dashboard 2.0 მოწესრიგება <span style="cursor:pointer;" onclick="closeDashboardCustomizer()">✕</span></h2>
             <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:10px;">მონიშნე ბარათები, რომლებიც გინდა ჩანდეს მთავარ გვერდზე:</p>
             <div id="dash-cards-toggle-list"></div>
             <button onclick="saveDashboardCustomization()" style="width:100%; margin-top:10px;">შენახვა</button>
@@ -730,7 +756,7 @@
     <!-- Create Custom Recipe Modal -->
     <div class="modal" id="create-recipe-modal">
         <div class="modal-content">
-            <h2>🥗 ახალი რეცეპტის შექმნა <span style="cursor:pointer;" onclick="closeCreateRecipeModal()">✕</span></h2>
+            <h2> ახალი რეცეპტის შექმნა <span style="cursor:pointer;" onclick="closeCreateRecipeModal()">✕</span></h2>
             <input type="text" id="cr-name" placeholder="კერძის დასახელება">
             <div class="flex-row">
                 <input type="number" id="cr-cal" placeholder="კკალ">
@@ -1510,6 +1536,17 @@
         if (auth && db) auth.onAuthStateChanged(function(user) {
             if (user) {
                 currentUser = user;
+                if (!user.emailVerified) {
+                    document.getElementById('auth-screen').classList.remove('active');
+                    document.getElementById('verify-screen').classList.add('active');
+                    document.getElementById('onboarding-screen').classList.remove('active');
+                    document.getElementById('app-container').style.display = 'none';
+                    var nav = document.getElementById('app-nav'); if (nav) nav.style.display = 'none';
+                    var fab = document.getElementById('fab-ai'); if (fab) fab.style.display = 'none';
+                    setTxt('verify-email-label', 'დადასტურების წერილი: ' + (user.email || ''));
+                    setTxt('verify-status', 'დაადასტურეთ ელფოსტა მიღებული ბმულით.');
+                    return;
+                }
                 
                 // Save user immediately so Admin dashboard sees all registered friends
                 db.collection('users').doc(user.uid).set({
@@ -1542,6 +1579,7 @@
                 });
             } else {
                 currentUser = null;
+                document.getElementById('verify-screen').classList.remove('active');
                 var authScreen = document.getElementById('auth-screen');
                 if (authScreen) authScreen.classList.add('active');
                 var appContainer = document.getElementById('app-container');
@@ -1590,12 +1628,15 @@
             showNotification("რეგისტრაცია მიმდინარეობს... ⏳");
             auth.createUserWithEmailAndPassword(em, pw).then(function(userCred) {
                 var u = userCred.user;
-                return db.collection('users').doc(u.uid).set({
+                return u.sendEmailVerification().then(function() {
+                    authStatus('დადასტურების წერილი გაიგზავნა: ' + em, false);
+                    return db.collection('users').doc(u.uid).set({
                     email: em,
                     registeredAt: new Date(),
                     setupComplete: false,
                     name: em.split('@')[0]
-                }, { merge: true }).then(function(){ showNotification("✅ რეგისტრაცია წარმატებულია!"); });
+                }, { merge: true }).then(function(){ showNotification("გადაამოწმეთ ელფოსტა და დაადასტურეთ ანგარიში."); });
+                });
             }).catch(function(e) { 
                 var msg = "რეგისტრაციის შეცდომა: ";
                 if (e.code === 'auth/email-already-in-use') {
@@ -1608,6 +1649,29 @@
             });
         }
 
+        function resendVerificationEmail() {
+            if (!auth || !auth.currentUser) return;
+            auth.currentUser.sendEmailVerification().then(function() {
+                setTxt('verify-status', 'ახალი წერილი გაიგზავნა. შეამოწმეთ Spam-იც.');
+            }).catch(function(e) { setTxt('verify-status', 'შეცდომა: ' + e.message); });
+        }
+        function checkEmailVerified() {
+            if (!auth || !auth.currentUser) return;
+            setTxt('verify-status', 'მოწმდება...');
+            auth.currentUser.reload().then(function() {
+                if (!auth.currentUser.emailVerified) {
+                    setTxt('verify-status', 'ელფოსტა ჯერ არ არის დადასტურებული.');
+                    return;
+                }
+                var u = auth.currentUser;
+                document.getElementById('verify-screen').classList.remove('active');
+                return db.collection('users').doc(u.uid).get().then(function(doc) {
+                    if (doc.exists) userDocData = Object.assign(userDocData, doc.data());
+                    if (!userDocData.setupComplete) document.getElementById('onboarding-screen').classList.add('active');
+                    else initApp();
+                });
+            }).catch(function(e) { setTxt('verify-status', 'შეცდომა: ' + e.message); });
+        }
         function resetPassword() {
             var em = document.getElementById('auth-email').value.trim();
             if (!em) em = prompt("შეიყვანეთ ელ-ფოსტა:");
