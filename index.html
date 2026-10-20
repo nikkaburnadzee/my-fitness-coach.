@@ -97,7 +97,8 @@
         .msg-bubble.me { background: var(--primary); color: #000; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 600; }
         .msg-bubble.coach { background: var(--surface); border: 1px solid var(--glass-border); color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; }
         
-        .fab-ai { position: fixed; bottom: 85px; right: 18px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 24px var(--accent-glow); cursor: pointer; z-index: 1000; transition: transform 0.2s; }
+        /* 📱 Fixed AI FAB Button positioning to avoid overlapping bottom bar */
+        .fab-ai { position: fixed; bottom: 105px; right: 18px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 24px var(--accent-glow); cursor: pointer; z-index: 999; transition: transform 0.2s; }
         .fab-ai:active { transform: scale(0.92); }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; background: rgba(6, 9, 14, 0.94); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); padding: 10px 0 18px 0; border-top: 1px solid var(--glass-border); z-index: 500; }
@@ -681,7 +682,7 @@
                 <div class="msg-bubble coach">გაუმარჯოს! მე შენი პირადი AI ქოუჩი და მეგობარი ვარ. მკითხე აბსოლუტურად ყველაფერი — კალორიები, ვარჯიში, დიეტა, თუ უბრალოდ მოტივაცია გჭირდება ან შაურმის შეჭმა გინდა და სინდისი გაწუხებს! 👊</div>
             </div>
             <div class="flex-row">
-                <input type="text" id="ai-input" placeholder="მკითხე ყველაფერი (მაგ: მეზარება, რა ვჭამო, შაურმა)..." style="margin:0;" onkeypress="if(event.key==='Enter') askAi()">
+                <input type="text" id="ai-input" placeholder="მკითხე ყველაფერი (მაგ: რა არ უნდა ვჭამო, რას მირჩევ)..." style="margin:0;" onkeypress="if(event.key==='Enter') askAi()">
                 <button class="accent" style="width:auto; padding:0 16px;" onclick="askAi()">></button>
             </div>
         </div>
@@ -899,6 +900,35 @@
             measurements: { waist: 0, chest: 0, hips: 0 }
         };
 
+        // 🛒 HEALTHY SHOPPING LIST (1-CLICK)
+        var healthyShoppingList = [
+            { name: "კვერცხი (30 ცალი)", price: 15 },
+            { name: "ქათმის ფილე (1 კგ)", price: 13.5 },
+            { name: "ხაჭო 5% (500გ)", price: 6.5 },
+            { name: "შვრია (1 კგ)", price: 4.5 },
+            { name: "წიწიბურა (1 კგ)", price: 5 },
+            { name: "სეზონური ბოსტნეული", price: 12 },
+            { name: "მაწონი (400გ)", price: 2.5 }
+        ];
+
+        function renderHealthyShopping() {
+            var html = '';
+            for (var i = 0; i < healthyShoppingList.length; i++) {
+                var it = healthyShoppingList[i];
+                html += '<div class="list-item"><div class="item-row"><div><b>' + it.name + '</b><div class="item-sub">~' + it.price + ' ₾</div></div><button class="secondary" style="padding:6px 12px; font-size:11px; width:auto;" onclick="quickBuyItem(' + i + ')">ვიყიდე</button></div></div>';
+            }
+            setHtml('healthy-shopping-list', html);
+        }
+
+        function quickBuyItem(i) {
+            var it = healthyShoppingList[i];
+            if (!userData.expenses) userData.expenses = [];
+            userData.expenses.push({ date: currentDate, name: it.name, amount: it.price });
+            saveCloudData();
+            updateUI();
+            showNotification("✅ " + it.name + " ჩაიწერა ხარჯებში!");
+        }
+
         // 🏋️ WORKOUT SPLITS
         var workoutSplits = {
             legs: {
@@ -1027,7 +1057,7 @@
             var cal = parseInt(document.getElementById('recipe-cal').value, 10) || 0;
             var prot = parseInt(document.getElementById('recipe-prot').value, 10) || 0;
 
-            if (!name || cal <= 0) return alert("შეიყვანეთ კერძის სახელი და კალორიები!");
+            if (!name || cal <= 0) return showNotification("შეიყვანეთ კერძის სახელი და კალორიები!", true);
             
             if (!userDocData.customRecipes) userDocData.customRecipes = [];
             userDocData.customRecipes.push({ name: name, cal: cal, prot: prot, fat: Math.round(cal * 0.03), carb: Math.round(cal * 0.1) });
@@ -1108,11 +1138,11 @@
                         showNotification("🔔 შეხსენებები გააქტიურებულია!");
                         new Notification("My Fitness Coach", { body: "მოგესალმებით! არ დაგავიწყდეთ წყლის დალევა და კვების ჩაწერა!" });
                     } else {
-                        alert("ნოტიფიკაციებზე ნებართვა არ არის გაცემული.");
+                        showNotification("ნოტიფიკაციებზე ნებართვა არ არის გაცემული", true);
                     }
                 });
             } else {
-                alert("ამ ბრაუზერს ნოტიფიკაციების მხარდაჭერა არ აქვს.");
+                showNotification("ამ ბრაუზერს ნოტიფიკაციების მხარდაჭერა არ აქვს", true);
             }
         }
 
@@ -1142,7 +1172,7 @@
         function sendGlobalBroadcast() {
             var inp = document.getElementById('admin-broadcast-input');
             var text = inp ? inp.value.trim() : '';
-            if (!text) return alert("შეიყვანეთ ტექსტი!");
+            if (!text) return showNotification("შეიყვანეთ ტექსტი!", true);
             db.collection('settings').doc('broadcast').set({
                 text: text,
                 timestamp: Date.now()
@@ -1158,26 +1188,7 @@
             });
         }
 
-        // 🤖 SUPER HUMAN, WITTY & SMART AI BOT
-        var funnyHumanAiKnowledge = {
-            "შაურმ": "აუჰ, შაურმა ვის არ უნდა, ძმაო/დაო? 🤤 მაგრამ მოდი რეალობას თვალი გავუსწოროთ: ერთი საშუალო შაურმა 850 კალორიაა და სოუსებში ჩაფლული ცხიმი. თუ მაინც შეჭამ, დღეს ვახშამი დაივიწყე, წყალი მიაყოლე და 5,000 ნაბიჯი ზემოდან გაიარე!",
-            "მეზარება": "აბა დაფიქრდი: დივანზე წოლით და ინსტაგრამის სქროლვით ვინმეს პრესი და კუნთები გაზრდია? 🤨 ადექი, სულ 10 წუთი ივარჯიშე! თუ 10 წუთში კიდევ გეზარებოდეს, თავს დაგანებებ. წამო, დაიწყე!",
-            "ლუდ": "ცივი ლუდი კარგია, მაგრამ 'თხევადი პურია'. 1 ბოთლი ლუდი ~220 კალორიაა, თან ცხიმის წვის პროცესს 48 საათით აჩერებს ღვიძლში. თუ სვამ — მაქსიმუმ 1 ცალი და ჩიფსების გარეშე!",
-            "ხვალ დავიწყებ": "ეგ 'ხვალ' უკვე 3 წელია მესმის! 😂 ორშაბათს ნუღარ ელოდები, დღესვე დაიწყე 1 ჭიქა წყლით და საღამოს 15-წუთიანი სიარულით. მომავალი შენ მადლობას გეტყვის!",
-            "მშია": "ნამდვილად გშია თუ უბრალოდ მოწყენილი ხარ? ჯერ ერთი დიდი ჭიქა წყალი დალიე და 10 წუთი დაიცადე. თუ ისევ გშია — მოხარშული კვერცხი, ხაჭო ან კიტრი შეჭამე, ტკბილეულს არ გაეკარო!",
-            "დეპრესია": "მესმის, ზოგჯერ ყველაფერი რთულად გვეჩვენება... მაგრამ იცოდი, რომ 20 წუთიანი ფეხით სიარული ბუნებრივად გამოყოფს ენდორფინებს და ხასიათს ასწორებს? ჩაიცვი, გადი სუფთა ჰაერზე და მუსიკას მოუსმინე. მე შენს გვერდით ვარ!",
-            "მიმატოვა": "ვინც დაგკარგა, იმან იდარდოს! 😉 ახლა საუკეთესო დროა შენი 'Revenge Body' გააკეთო. სპორტდარბაზი, სწორი კვება, დისციპლინა — 3 თვეში ისეთ ფორმაში იქნები, რომ თვითონ ინანებენ!",
-            "კვერცხ": "მოხარშული კვერცხი ფიტნესის ოქროა! 1 ცალი შეიცავს ~78 კკალორიას და 6გ უმაღლესი ხარისხის ცილას. საუზმისთვის იდეალურია.",
-            "ქათამ": "ქათმის ფილე (100გ) შეიცავს ~165 კკალორიას და 31გ სუფთა ცილას თითქმის ცხიმის გარეშე. კუნთის მთავარი სამშენებლო მასალაა!",
-            "წიწიბურ": "წიწიბურა ჩემპიონების საჭმელია: 100გ მოხარშული ~130 კალორიაა, რთული ნახშირწყალია და ენერგიას თანაბრად გაწვდის მთელი დღე.",
-            "ხინკალ": "ქალაქური ხინკალი 1 ცალი ~68 კალორიაა. 5 ცალი ხინკალი = ~340 კკალ. წვენი არ დაღვარო, მაგრამ 15 ცალს ერთად ნუ გადაყლაპავ, თუ წონის კლება გინდა!",
-            "ხაჭაპურ": "1 ნაჭერი იმერული ხაჭაპური 350-400 კალორიაა და სავსეა ცხიმით. თუ შეჭამ, დღის დარჩენილი რაციონი მხოლოდ სალათებითა და ცილით შეავსე.",
-            "წყალ": "წყალი შენი საუკეთესო მეგობარია. ცხიმის წვის პროცესი (ლიპოლიზი) წყლის გარეშე ფიზიკურად ვერ წარიმართება! დალიე მინიმუმ 2.5 ლიტრი.",
-            "ძილ": "ღამე თუ არ გძინავს, კორტიზოლი (სტრესის ჰორმონი) ადის ჭერში და სხეული იწყებს ცხიმის შენახვას მუცელზე. 7-8 საათი იძინე!",
-            "ამინდ": "როგორი ამინდიც არ უნდა იყოს გარეთ, შენს მიზნებს ამინდი ვერ შეაჩერებს! წვიმს? სახლში გავაკეთოთ 15-წუთიანი HIIT!",
-            "როგორ ხარ": "მე ფორმაში ვარ, 100%-ით დამუხტული! შენ როგორ ხარ? დღეს წყალი დალიე? ვარჯიშს როდის ვიწყებთ?"
-        };
-
+        // 🤖 COMPREHENSIVE & INTELLIGENT AI BOT
         function askAi() {
             var input = document.getElementById('ai-input');
             var v = input ? input.value.trim().toLowerCase() : '';
@@ -1190,13 +1201,92 @@
             setTimeout(function() {
                 var reply = "";
 
-                for (var key in funnyHumanAiKnowledge) {
-                    if (v.indexOf(key) !== -1) {
-                        reply = funnyHumanAiKnowledge[key];
-                        break;
-                    }
+                // 1. რა არ უნდა ვჭამო / რას მოვერიდო
+                if (v.indexOf("რა არ უნდა") !== -1 || v.indexOf("არ უნდა ვჭამო") !== -1 || v.indexOf("არ შევჭამო") !== -1 || v.indexOf("არ შეიძლება") !== -1 || v.indexOf("მავნე") !== -1 || v.indexOf("მოვერიდო") !== -1) {
+                    reply = "🚫 რას უნდა მოერიდო აუცილებლად:\n" +
+                            "1. რაფინირებულ შაქარსა და გაზიან ტკბილ სასმელებს (კოლა, წვენები - თხევადი შაქარია!).\n" +
+                            "2. ტრანს-ცხიმებსა და ღრმად შემწვარ საკვებს (ფრი, ჩიფსები, ქუჩის ღვეზელები).\n" +
+                            "3. მაიონეზიან სოუსებს (შაურმის თეთრი სოუსი).\n" +
+                            "4. თეთრ ცომეულსა და მარგარინიან ტკბილეულს.\n" +
+                            "ეს პროდუქტები ინსულინს მაღლა სწევს და ცხიმის წვას ბლოკავს!";
                 }
 
+                // 2. რა ვჭამო / რას მირჩევ / მენიუ / საჭმელი
+                else if (v.indexOf("რა ვჭამო") !== -1 || v.indexOf("რას მირჩევ") !== -1 || v.indexOf("საჭმელ") !== -1 || v.indexOf("საჭმლ") !== -1 || v.indexOf("რა შევჭამო") !== -1 || v.indexOf("მენიუ") !== -1 || v.indexOf("საუზმეზე") !== -1 || v.indexOf("სადილზე") !== -1 || v.indexOf("ვახშამზე") !== -1) {
+                    reply = "🥗 აი ჩემი ოქროს რეკომენდაცია დღისთვის:\n" +
+                            "🍳 საუზმე: 2-3 მოხარშული კვერცხი + შვრიის ფაფა ან ჭვავის პური სულგუნით.\n" +
+                            "🍗 სადილი: 150-200გ ქათმის ფილე (ან თევზი/საქონელი) + წიწიბურა/ბრინჯი + კიტრისა და პომიდვრის სალათი.\n" +
+                            "🍏 წახემსება: 1 მწვანე ვაშლი, 1 ჭიქა მაწონი ან ერთი მუჭა ნიგოზი.\n" +
+                            "🧀 ვახშამი: 150გ უცხიმო ხაჭო ან თინუსის სალათი მწვანილებით.\n" +
+                            "ეს მენიუ დაგანაყრებს, კუნთს შეგინარჩუნებს და ცხიმს დაგადნობს!";
+                }
+
+                // 3. შაურმა / ფასტფუდი
+                else if (v.indexOf("შაურმ") !== -1 || v.indexOf("პიცა") !== -1 || v.indexOf("ბურგერ") !== -1) {
+                    reply = "აუჰ, შაურმა და ფასტფუდი ვის არ უყვარს? 🤤 მაგრამ ერთი საშუალო შაურმა 850 კალორიაა და სოუსებში ჩაფლული ცხიმი. თუ მაინც შეჭამ, დღეს ვახშამი მსუბუქი სალათით ჩაანაცვლე და 5,000 ნაბიჯი ზემოდან გაიარე!";
+                }
+
+                // 4. სიზარმაცე / მოტივაცია / ხვალ დავიწყებ
+                else if (v.indexOf("მეზარებ") !== -1 || v.indexOf("ვერ ვდგებ") !== -1 || v.indexOf("მოტივაც") !== -1 || v.indexOf("ხვალ დავიწყებ") !== -1) {
+                    reply = "აბა დაფიქრდი: დივანზე წოლით და სქროლვით ვინმეს პრესი და კუნთები გაზრდია? 🤨 ადექი, სულ 10 წუთი ივარჯიშე! წამო, ახლავე ჩართე ვარჯიშის ტაიმერი, მე შენთან ვარ!";
+                }
+
+                // 5. წყალი
+                else if (v.indexOf("წყალ") !== -1) {
+                    reply = "💧 წყალი არის შენი მეტაბოლიზმის მთავარი საწვავი! დღეში მინიმუმ 2.5-3 ლიტრი უნდა დალიო. წესია: გაღვიძებისთანავე 1-2 ჭიქა, ყოველი ჭამის წინ 1 ჭიქა, და ვარჯიშის დროს ყლუპ-ყლუპად!";
+                }
+
+                // 6. მუცელი / პრესი / ღიპი
+                else if (v.indexOf("მუცელ") !== -1 || v.indexOf("მუცლ") !== -1 || v.indexOf("პრეს") !== -1 || v.indexOf("ღიპ") !== -1) {
+                    reply = "🔥 მუცლის ლოკალური ცხიმის წვა არ არსებობს! პრესის ვარჯიშები კუნთს ამაგრებს, მაგრამ ცხიმს მთელი სხეულიდან წვავს კალორიული დეფიციტი, 10,000 ნაბიჯი და შაქრის ამოღება.";
+                }
+
+                // 7. ლუდი / ალკოჰოლი
+                else if (v.indexOf("ლუდ") !== -1 || v.indexOf("ალკოჰოლ") !== -1 || v.indexOf("ღვინო") !== -1) {
+                    reply = "ცივი ლუდი კარგია, მაგრამ 'თხევადი პურია'. 1 ბოთლი ლუდი ~220 კალორიაა, თან ცხიმის წვის პროცესს 48 საათით აჩერებს ღვიძლში. თუ სვამ — მაქსიმუმ 1 ცალი და ჩიფსების გარეშე!";
+                }
+
+                // 8. კვერცხი
+                else if (v.indexOf("კვერცხ") !== -1) {
+                    reply = "მოხარშული კვერცხი ფიტნესის ოქროა! 1 ცალი შეიცავს ~78 კკალორიას და 6გ უმაღლესი ხარისხის ცილას. საუზმისთვის ან წახემსებისთვის იდეალურია.";
+                }
+
+                // 9. ქათმის ფილე
+                else if (v.indexOf("ქათამ") !== -1 || v.indexOf("ფილე") !== -1) {
+                    reply = "ქათმის ფილე (100გ) შეიცავს ~165 კკალორიას და 31გ სუფთა ცილას თითქმის ცხიმის გარეშე. კუნთის მთავარი სამშენებლო მასალაა!";
+                }
+
+                // 10. წიწიბურა
+                else if (v.indexOf("წიწიბურ") !== -1) {
+                    reply = "წიწიბურა ჩემპიონების საჭმელია: 100გ მოხარშული ~130 კალორიაა, რთული ნახშირწყალია და ენერგიას თანაბრად გაწვდის მთელი დღე.";
+                }
+
+                // 11. ხინკალი
+                else if (v.indexOf("ხინკალ") !== -1) {
+                    reply = "ქალაქური ხინკალი 1 ცალი ~68 კალორიაა. 5 ცალი ხინკალი = ~340 კკალ. წვენი არ დაღვარო, მაგრამ 15 ცალს ერთად ნუ გადაყლაპავ, თუ წონის კლება გინდა!";
+                }
+
+                // 12. ხაჭაპური
+                else if (v.indexOf("ხაჭაპურ") !== -1) {
+                    reply = "1 ნაჭერი იმერული ხაჭაპური 350-400 კალორიაა და სავსეა ცხიმით. თუ შეჭამ, დღის დარჩენილი რაციონი მხოლოდ სალათებითა და ცილით შეავსე.";
+                }
+
+                // 13. ძილი
+                else if (v.indexOf("ძილ") !== -1 || v.indexOf("უძილობა") !== -1) {
+                    reply = "ღამე თუ არ გძინავს, კორტიზოლი (სტრესის ჰორმონი) ადის ჭერში და სხეული იწყებს ცხიმის შენახვას მუცელზე. 7-8 საათი იძინე ღრმად!";
+                }
+
+                // 14. მადლობა
+                else if (v.indexOf("მადლობ") !== -1 || v.indexOf("გაიხარე") !== -1) {
+                    reply = "არაფრის, ჩემო მეგობარო! შენი შედეგი ჩემი სიხარულია. განაგრძე წინსვლა! 🔥";
+                }
+
+                // 15. მოკითხვა
+                else if (v.indexOf("გამარჯობა") !== -1 || v.indexOf("სალამი") !== -1 || v.indexOf("როგორ ხარ") !== -1) {
+                    reply = "გაუმარჯოს! მე ფორმაში ვარ, 100%-ით დამუხტული. შენ როგორ ხარ? დღეს წყალი დალიე? ვარჯიშს როდის ვიწყებთ?";
+                }
+
+                // Check Food Database
                 if (!reply) {
                     for (var f = 0; f < foodDatabase.length; f++) {
                         var item = foodDatabase[f];
@@ -1208,20 +1298,13 @@
                     }
                 }
 
+                // General fallback
                 if (!reply) {
-                    if (v.indexOf("მადლობ") !== -1 || v.indexOf("გაიხარე") !== -1) {
-                        reply = "არაფრის, ჩემო მეგობარო! შენი შედეგი ჩემი სიხარულია. განაგრძე წინსვლა! 🔥";
-                    } else if (v.indexOf("ვარჯიშ") !== -1 || v.indexOf("დარბაზ") !== -1) {
-                        reply = "ვარჯიშზე მთავარია თანმიმდევრულობა. შედი 'აქტივობის' ტაბში, აირჩიე შენი სპლიტი (ფეხები, მკერდი თუ ზურგი) და მიჰყევი გეგმას. დასვენების ტაიმერიც ჩაგირთე!";
-                    } else if (v.indexOf("როგორ") !== -1 || v.indexOf("დავიკლო") !== -1) {
-                        reply = "მარტივი მათემატიკაა: დღიურ კალორიებს არ გადააცილო, 2.5ლ წყალი დალიე, 10,000 ნაბიჯი გაიარე და შაქარი ამოიღე. შედეგს 2 კვირაში საკუთარი თვალით ნახავ!";
-                    } else {
-                        reply = "შესანიშნავი კითხვაა! როგორც შენი მეგობარი გირჩევ: დღის მთავარი ამოცანაა კალორიული ბალანსის დაცვა, 2.5ლ წყალი და კარგი განწყობა. თუ რაიმე კონკრეტული გაინტერესებს (კალორიები, ვარჯიშები, შიმშილი), მკითხე და დეტალურად აგიხსნი!";
-                    }
+                    reply = "შესანიშნავი კითხვაა! როგორც შენი მეგობარი გირჩევ: დღის მთავარი ამოცანაა კალორიული ბალანსის დაცვა, 2.5ლ წყალი და აქტივობა. თუ რაიმე კონკრეტული გაინტერესებს (კალორიები, ვარჯიშები, შიმშილი), მკითხე და დეტალურად აგიხსნი!";
                 }
 
                 if (b) {
-                    b.innerHTML += '<div class="msg-bubble coach">🤖 ' + reply + '</div>';
+                    b.innerHTML += '<div class="msg-bubble coach">🤖 ' + reply.replace(/\n/g, '<br>') + '</div>';
                     b.scrollTop = b.scrollHeight;
                 }
             }, 300);
@@ -1344,6 +1427,14 @@
         auth.onAuthStateChanged(function(user) {
             if (user) {
                 currentUser = user;
+                
+                // Save user immediately so Admin dashboard sees all registered friends
+                db.collection('users').doc(user.uid).set({
+                    email: user.email,
+                    lastActive: new Date(),
+                    emailVerified: user.emailVerified
+                }, { merge: true });
+
                 if (!user.emailVerified) {
                     showVerifyScreen(user);
                     return;
@@ -1397,7 +1488,7 @@
                         hideVerifyScreen();
                         initApp();
                     } else {
-                        alert("ელ-ფოსტა ჯერ არ არის დადასტურებული! გთხოვთ შეამოწმოთ Spam საქაღალდეც.");
+                        showNotification("ელ-ფოსტა ჯერ არ არის დადასტურებული! შეამოწმეთ სპამიც.", true);
                     }
                 });
             }
@@ -1406,8 +1497,7 @@
         function resendVerificationEmail() {
             if (currentUser) {
                 currentUser.sendEmailVerification().then(function() {
-                    alert("ვერიფიკაციის ბმული გაგზავნილია: " + currentUser.email);
-                    showNotification("✉️ ბმული გაიგზავნა!");
+                    showNotification("✉️ ბმული გაიგზავნა: " + currentUser.email);
                 });
             }
         }
@@ -1415,8 +1505,8 @@
         function registerUser() {
             var em = document.getElementById('auth-email').value.trim();
             var pw = document.getElementById('auth-password').value;
-            if (!em || !pw) return alert("შეიყვანე Email და პაროლი!");
-            if (pw.length < 6) return alert("პაროლი უნდა იყოს მინ. 6 სიმბოლო!");
+            if (!em || !pw) return showNotification("შეიყვანე Email და პაროლი!", true);
+            if (pw.length < 6) return showNotification("პაროლი უნდა იყოს მინ. 6 სიმბოლო!", true);
 
             auth.createUserWithEmailAndPassword(em, pw).then(function(userCred) {
                 var u = userCred.user;
@@ -1424,20 +1514,21 @@
                     email: em,
                     registeredAt: new Date(),
                     setupComplete: false,
-                    name: em.split('@')[0]
+                    name: em.split('@')[0],
+                    emailVerified: false
                 }, { merge: true });
 
                 u.sendEmailVerification().then(function() {
-                    alert("რეგისტრაცია წარმატებულია!\nვერიფიკაციის ბმული გაგზავნილია მეილზე: " + em);
+                    showNotification("✉️ ვერიფიკაციის ბმული გაგზავნილია მეილზე: " + em);
                 });
-            }).catch(function(e) { alert("შეცდომა: " + e.message); });
+            }).catch(function(e) { showNotification("შეცდომა: " + e.message, true); });
         }
 
         function loginUser() {
             var em = document.getElementById('auth-email').value.trim();
             var pw = document.getElementById('auth-password').value;
-            if (!em || !pw) return alert("შეიყვანე Email და პაროლი!");
-            auth.signInWithEmailAndPassword(em, pw).catch(function(e) { alert("შესვლის შეცდომა: " + e.message); });
+            if (!em || !pw) return showNotification("შეიყვანე Email და პაროლი!", true);
+            auth.signInWithEmailAndPassword(em, pw).catch(function(e) { showNotification("შესვლის შეცდომა: " + e.message, true); });
         }
 
         function resetPassword() {
@@ -1445,8 +1536,8 @@
             if (!em) em = prompt("შეიყვანეთ ელ-ფოსტა პაროლის აღსადგენად:");
             if (!em) return;
             auth.sendPasswordResetEmail(em).then(function() {
-                alert("პაროლის აღდგენის ბმული გაგზავნილია მეილზე: " + em);
-            }).catch(function(e) { alert("შეცდომა: " + e.message); });
+                showNotification("✉️ პაროლის აღდგენის ბმული გაიგზავნა მეილზე: " + em);
+            }).catch(function(e) { showNotification("შეცდომა: " + e.message, true); });
         }
 
         function logoutUser() {
@@ -1541,6 +1632,7 @@
             generateSchedule();
             renderBadges();
             renderBudgetDietPlan();
+            renderHealthyShopping();
             renderCustomRecipes();
         }
 
@@ -1777,11 +1869,9 @@
         }
 
         function clearAllFoods() {
-            if (confirm("ნამდვილად გსურს დღევანდელი კვების სრულად წაშლა?")) {
-                userData.foods = [];
-                saveCloudData();
-                showNotification("🗑️ კვება გასუფთავდა!");
-            }
+            userData.foods = [];
+            saveCloudData();
+            showNotification("🗑️ კვება გასუფთავდა!");
         }
 
         function copyYesterdayFoods() {
@@ -1825,12 +1915,10 @@
         }
 
         function resetWater() {
-            if (confirm("ნამდვილად გსურს წყლის განულება?")) {
-                userData.water = 0;
-                saveCloudData();
-                updateUI();
-                showNotification("💧 წყალი განულდა");
-            }
+            userData.water = 0;
+            saveCloudData();
+            updateUI();
+            showNotification("💧 წყალი განულდა");
         }
 
         function addCustomWater() {
@@ -1856,12 +1944,10 @@
         }
 
         function resetSteps() {
-            if (confirm("ნამდვილად გსურს ნაბიჯების განულება?")) {
-                userData.steps = 0;
-                saveCloudData();
-                updateUI();
-                showNotification("🚶 ნაბიჯები განულდა");
-            }
+            userData.steps = 0;
+            saveCloudData();
+            updateUI();
+            showNotification("🚶 ნაბიჯები განულდა");
         }
 
         function toggleHabit(h) {
@@ -1931,7 +2017,7 @@
             var reps = repsEl ? parseInt(repsEl.value, 10) : 0;
             var weight = weightEl ? (parseFloat(weightEl.value) || 0) : 0;
 
-            if (!name || !sets || !reps) return alert("შეიყვანე ვარჯიშის სახელი, სეტები და გამეორებები!");
+            if (!name || !sets || !reps) return showNotification("შეიყვანე სახელი, სეტები და გამეორებები!", true);
             if (!userData.workouts) userData.workouts = [];
             
             // Check PR (Personal Record)
@@ -1963,12 +2049,10 @@
         }
 
         function deleteWorkoutLog(index) {
-            if (confirm("წავშალოთ ეს ვარჯიში?")) {
-                userData.workouts.splice(index, 1);
-                saveCloudData();
-                updateUI();
-                showNotification("🗑️ ვარჯიში წაიშალა");
-            }
+            userData.workouts.splice(index, 1);
+            saveCloudData();
+            updateUI();
+            showNotification("🗑️ ვარჯიში წაიშალა");
         }
 
         // WEIGHT & MEASUREMENTS
@@ -2100,50 +2184,63 @@
             setHtml('budget-diet-details', dietHtml);
         }
 
-        // VISUAL SCHEDULE TIMELINE
-        function timeMath(timeStr, addMins) {
-            var parts = timeStr.split(':');
-            var h = parseInt(parts[0], 10);
-            var m = parseInt(parts[1], 10) + addMins;
-            while (m < 0) { m += 60; h -= 1; }
-            while (m >= 60) { m -= 60; h += 1; }
-            while (h < 0) { h += 24; }
-            while (h >= 24) { h -= 24; }
-            var hh = h.toString();
-            var mm = m.toString();
-            if (hh.length < 2) hh = '0' + hh;
-            if (mm.length < 2) mm = '0' + mm;
-            return hh + ':' + mm;
-        }
-
+        // ⏰ CHRONOLOGICALLY SORTED TIMELINE (FROM WAKE UP TO SLEEP)
         function generateSchedule() {
             var wStart = (document.getElementById('work-start') || {}).value || "10:00";
             var wEnd = (document.getElementById('work-end') || {}).value || "19:00";
             var wake = (document.getElementById('wake-time') || {}).value || "08:00";
             var sleep = (document.getElementById('sleep-time') || {}).value || "23:30";
 
-            var now = new Date();
-            var currentClock = (now.getHours() < 10 ? '0' : '') + now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+            function toMins(tStr) {
+                var p = tStr.split(':');
+                return parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
+            }
+            function toStr(mins) {
+                mins = mins % (24 * 60);
+                if (mins < 0) mins += 24 * 60;
+                var h = Math.floor(mins / 60);
+                var m = mins % 60;
+                return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+            }
+
+            var wakeM = toMins(wake);
+            var sleepM = toMins(sleep);
+            if (sleepM <= wakeM) sleepM += 24 * 60;
+
+            var wsM = toMins(wStart);
+            var weM = toMins(wEnd);
+            if (wsM < wakeM) wsM += 24 * 60;
+            if (weM <= wsM) weM += 24 * 60;
+
+            var lunchM = wsM + Math.floor((weM - wsM) / 2);
+            var dinnerM = Math.min(weM + 60, sleepM - 90);
 
             var events = [
-                { time: wake, desc: "გაღვიძება, 1 ჭიქა თბილი წყალი და 5-წთ გაწელვა" },
-                { time: timeMath(wake, 30), desc: "ცილოვანი საუზმე (კვერცხი / შვრია) & ვიტამინები" },
-                { time: wStart, desc: "სამუშაო დღის დაწყება + 250მლ წყალი სამუშაო მაგიდასთან" },
-                { time: timeMath(wStart, 210), desc: "სადილი (ქათმის ფილე + წიწიბურა / ბრინჯი + ბოსტნეული)" },
-                { time: timeMath(wEnd, -30), desc: "წახემსება (ვაშლი / ხაჭო / მაწონი) და წყალი" },
-                { time: wEnd, desc: "სამსახურის დასრულება, ფეხით სიარული (ნაბიჯების შევსება)" },
-                { time: timeMath(wEnd, 60), desc: "ვახშამი & 18:6 შიმშილის ტაიმერის გააქტიურება" },
-                { time: timeMath(sleep, -30), desc: "ეკრანების გამორთვა, მელატონინის გამომუშავება & დასვენება" },
-                { time: sleep, desc: "ღრმა ძილი (7-8 საათი კუნთების აღდგენისა და ცხიმის წვისთვის)" }
+                { m: wakeM, desc: "გაღვიძება, 1 ჭიქა თბილი წყალი და 5-წთ გაწელვა" },
+                { m: wakeM + 35, desc: "ცილოვანი საუზმე (კვერცხი / შვრია) & ვიტამინები" },
+                { m: wsM, desc: "სამუშაო დღის დაწყება + 250მლ წყალი" },
+                { m: lunchM, desc: "სადილი (ქათმის ფილე + წიწიბურა / ბრინჯი + ბოსტნეული)" },
+                { m: weM, desc: "სამსახურის დასრულება, ფეხით სიარული (ნაბიჯების შევსება)" },
+                { m: dinnerM, desc: "ვახშამი & 18:6 შიმშილის ტაიმერის გააქტიურება" },
+                { m: sleepM - 30, desc: "ეკრანების გამორთვა, მელატონინის გამომუშავება & დასვენება" },
+                { m: sleepM, desc: "ღრმა ძილი (7-8 საათი კუნთების აღდგენისა და ცხიმის წვისთვის)" }
             ];
+
+            // Sort sequentially from wake up time
+            events.sort(function(a, b) { return a.m - b.m; });
+
+            var now = new Date();
+            var currentMins = now.getHours() * 60 + now.getMinutes();
+            if (currentMins < wakeM && sleepM > 24 * 60) currentMins += 24 * 60;
 
             var html = '';
             for (var i = 0; i < events.length; i++) {
                 var ev = events[i];
-                var isCurrent = (currentClock >= ev.time && (i === events.length - 1 || currentClock < events[i+1].time));
+                var timeStr = toStr(ev.m);
+                var isCurrent = (currentMins >= ev.m && (i === events.length - 1 || currentMins < events[i+1].m));
                 var currClass = isCurrent ? 'current' : '';
                 html += '<div class="routine-node ' + currClass + '">' +
-                    '<b style="color:' + (isCurrent ? 'var(--primary)' : 'var(--text)') + '; font-size:13px;">' + ev.time + '</b> ' +
+                    '<b style="color:' + (isCurrent ? 'var(--primary)' : 'var(--text)') + '; font-size:13px;">' + timeStr + '</b> ' +
                     (isCurrent ? '<span style="font-size:10px; background:var(--primary); color:#000; padding:2px 6px; border-radius:8px; font-weight:800; margin-left:6px;">ახლა</span>' : '') +
                     '<div class="item-sub" style="margin-top:2px;">' + ev.desc + '</div>' +
                     '</div>';
@@ -2275,26 +2372,60 @@
             if (p) updates.photo = p;
             updates.targetWeight = tw;
             db.collection('users').doc(currentUser.uid).set(updates, { merge: true }).then(function() {
-                if (pwd) currentUser.updatePassword(pwd).then(function() { alert("პაროლი შეიცვალა"); });
+                if (pwd) currentUser.updatePassword(pwd).then(function() { showNotification("პაროლი შეიცვალა"); });
                 closeSettings();
                 window.location.reload();
             });
         }
 
         // 👑 ADMIN PORTAL (ONLY FOR nikkaburnadzee@gmail.com)
+        var adminUsersMap = {};
+
         function loadAdminDashboard() {
             if (!currentUser || !currentUser.email || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
             
+            // 1. Listen to users collection
             db.collection('users').onSnapshot(function(snap) {
-                var d = '<option value="">-- აირჩიე მომხმარებელი --</option>';
-                var listHtml = '';
                 snap.forEach(function(doc) {
-                    var u = doc.data();
                     var uid = doc.id;
+                    var u = doc.data() || {};
                     var uEmail = u.email || 'უცნობი მეილი';
-                    d += '<option value="' + uid + '">' + escapeHTML(uEmail) + '</option>';
+                    if (uEmail.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return; // Skip admin himself
+                    adminUsersMap[uid] = Object.assign(adminUsersMap[uid] || {}, u, { uid: uid, email: uEmail });
+                });
+                renderAdminUsersUI();
+            });
 
-                    db.collection('users').doc(uid).collection('days').doc(currentDate).get().then(function(dayDoc) {
+            // 2. Also listen to chats collection to ensure NO user is missed
+            db.collection('chats').onSnapshot(function(snap) {
+                snap.forEach(function(doc) {
+                    var uid = doc.id;
+                    var cData = doc.data() || {};
+                    var uEmail = cData.userEmail || cData.email;
+                    if (uEmail && uEmail.toLowerCase() === ADMIN_EMAIL.toLowerCase()) return;
+                    if (uEmail) {
+                        adminUsersMap[uid] = Object.assign(adminUsersMap[uid] || {}, { uid: uid, email: uEmail }, cData);
+                    }
+                });
+                renderAdminUsersUI();
+            });
+        }
+
+        function renderAdminUsersUI() {
+            var dropdown = '<option value="">-- აირჩიე მომხმარებელი --</option>';
+            var listHtml = '';
+            var userIds = Object.keys(adminUsersMap);
+
+            for (var i = 0; i < userIds.length; i++) {
+                var uid = userIds[i];
+                var u = adminUsersMap[uid];
+                var uEmail = u.email || 'კლიენტი';
+                var selectedAttr = (selectedAdminUserUid === uid) ? ' selected' : '';
+                dropdown += '<option value="' + uid + '"' + selectedAttr + '>' + escapeHTML(uEmail) + '</option>';
+
+                // Render in monitoring list
+                (function(userUid, userObj) {
+                    db.collection('users').doc(userUid).collection('days').doc(currentDate).get().then(function(dayDoc) {
                         var dData = dayDoc.exists ? dayDoc.data() : { foods: [], water: 0, steps: 0 };
                         var cals = 0;
                         var badFood = false;
@@ -2306,16 +2437,26 @@
 
                         var alertTag = badFood ? '<span style="color:var(--danger); font-weight:bold;">⚠️ დარღვევა</span>' : '<span style="color:var(--primary);">✅ წესრიგშია</span>';
 
-                        listHtml += '<div class="list-item" style="border-color:' + (badFood ? 'var(--danger)' : 'var(--glass-border)') + '">' +
+                        var itemHtml = '<div class="list-item" style="border-color:' + (badFood ? 'var(--danger)' : 'var(--glass-border)') + '">' +
                             '<div class="item-row">' +
-                            '<div><b>' + escapeHTML(uEmail) + '</b> (' + (u.name || 'კლიენტი') + ')<div class="item-sub">კალორია: ' + cals + ' | წყალი: ' + (dData.water || 0) + ' მლ | ნაბიჯები: ' + (dData.steps || 0) + '</div></div>' +
-                            '<div style="display:flex; align-items:center; gap:8px;">' + alertTag + ' <button class="secondary" style="padding:4px 8px; font-size:10px; width:auto;" onclick="selectUserForAdminChat(\'' + uid + '\')">💬 ჩატი & მართვა</button></div>' +
+                            '<div><b>' + escapeHTML(userObj.email) + '</b> (' + (userObj.name || 'კლიენტი') + ')<div class="item-sub">კალორია: ' + cals + ' | წყალი: ' + (dData.water || 0) + ' მლ | ნაბიჯები: ' + (dData.steps || 0) + '</div></div>' +
+                            '<div style="display:flex; align-items:center; gap:8px;">' + alertTag + ' <button class="secondary" style="padding:6px 10px; font-size:10px; width:auto;" onclick="selectUserForAdminChat(\'' + userUid + '\')">💬 ჩატი & მართვა</button></div>' +
                             '</div></div>';
-                        setHtml('admin-user-list', listHtml);
+
+                        var listContainer = document.getElementById('admin-user-list');
+                        if (listContainer) {
+                            var existing = document.getElementById('admin-user-row-' + userUid);
+                            if (existing) {
+                                existing.outerHTML = '<div id="admin-user-row-' + userUid + '">' + itemHtml + '</div>';
+                            } else {
+                                listContainer.innerHTML += '<div id="admin-user-row-' + userUid + '">' + itemHtml + '</div>';
+                            }
+                        }
                     });
-                });
-                setHtml('admin-user-dropdown', d);
-            });
+                })(uid, u);
+            }
+
+            setHtml('admin-user-dropdown', dropdown);
         }
 
         function selectUserForAdminChat(uid) {
@@ -2367,7 +2508,7 @@
         }
 
         function saveClientGoalsFromAdmin() {
-            if (!selectedAdminUserUid) return;
+            if (!selectedAdminUserUid) return showNotification("აირჩიეთ კლიენტი!", true);
             var cal = parseInt(document.getElementById('adm-edit-cal').value, 10) || 2000;
             var prot = parseInt(document.getElementById('adm-edit-prot').value, 10) || 120;
             var water = parseInt(document.getElementById('adm-edit-water').value, 10) || 2500;
@@ -2385,7 +2526,8 @@
             if (!currentUser || !currentUser.email || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
             var input = document.getElementById('admin-chat-input');
             var t = input ? escapeHTML(input.value.trim()) : '';
-            if (!t || !selectedAdminUserUid) return;
+            if (!selectedAdminUserUid) return showNotification("ჯერ აირჩიეთ კლიენტი სიიდან!", true);
+            if (!t) return;
             triggerHaptic();
 
             var msgTime = Date.now();
@@ -2402,6 +2544,7 @@
             }, { merge: true });
 
             setVal('admin-chat-input', '');
+            showNotification("✉️ შეტყობინება გაიგზავნა!");
         }
 
         function backupClientData() {
