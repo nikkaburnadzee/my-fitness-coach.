@@ -137,7 +137,7 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes tabSlide { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: translateX(0); } }
 
-        .chat-container { max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; padding-right: 4px; }
+        .chat-container { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; padding-right: 4px; }
         .chat-bubble { padding: 10px 14px; border-radius: 14px; font-size: 12px; max-width: 82%; line-height: 1.4; animation: fadeIn 0.2s ease-in; word-break: break-word; }
         .chat-bubble.user { background: linear-gradient(135deg, var(--accent), #6d28d9); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
         .chat-bubble.coach { background: rgba(16, 185, 129, 0.18); border: 1px solid var(--primary); color: white; align-self: flex-start; border-bottom-left-radius: 2px; }
@@ -161,7 +161,14 @@
         .user-row.alert { border-color: rgba(239, 68, 68, 0.5); background: rgba(239,68,68,0.1); }
         
         .plan-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 10px 12px; border-radius: 12px; margin-bottom: 8px; border-left: 3px solid var(--primary); }
+        .sleep-feedback { font-size: 12px; margin-top: 8px; padding: 8px; border-radius: 8px; display: none; }
+        .sleep-feedback.good { background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--primary); display: block;}
+        .sleep-feedback.bad { background: rgba(239, 68, 68, 0.1); border-left: 3px solid var(--danger); display: block;}
+
         .support-box { background: rgba(16, 185, 129, 0.08); border: 1px dashed var(--primary); border-radius: 14px; padding: 12px; text-align: center; margin-top: 10px; }
+        .photo-gallery { display: flex; gap: 8px; overflow-x: auto; margin-top: 8px; }
+        .photo-card { position: relative; min-width: 80px; height: 80px; border-radius: 8px; overflow: hidden; border: 1px solid var(--glass-border); background:#000;}
+        .photo-card img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -178,7 +185,7 @@
             <button onclick="loginUser()" style="margin-top: 6px;">შესვლა</button>
             <button class="secondary" style="margin-top: 8px;" onclick="registerUser()">რეგისტრაცია</button>
             <div style="margin-top:16px; font-size:11px; color:var(--text-muted);">
-                კითხვების შემთხვევაში: <a href="mailto:nikkaburnadze@gmail.com" style="color:var(--primary); text-decoration:none;">nikkaburnadze@gmail.com</a>
+                ბაგის/კითხვის შემთხვევაში: <a href="mailto:nikkaburnadze@gmail.com" style="color:var(--primary); text-decoration:none;">nikkaburnadze@gmail.com</a>
             </div>
         </div>
     </div>
@@ -261,7 +268,7 @@
             </div>
         </div>
 
-        <!-- TAB 3: აქტივობა & ვარჯიში -->
+        <!-- TAB 3: აქტივობა, ვარჯიში & ძილი -->
         <div id="tab-activity" class="tab-content">
             <div class="card">
                 <h2>💧 წყალი</h2>
@@ -292,6 +299,16 @@
                 </div>
                 <button id="workout-btn" style="background: linear-gradient(135deg, #f59e0b, #d97706);" onclick="startWorkoutTimer()">⏱️ ვარჯიშის დაწყება</button>
             </div>
+
+            <div class="card">
+                <h2>🌙 ძილის ანალიზატორი</h2>
+                <div class="flex-row">
+                    <div><label style="font-size:11px; color:var(--text-muted);">დავიძინე</label><input type="time" id="sleep-start" value="23:30"></div>
+                    <div><label style="font-size:11px; color:var(--text-muted);">გავიღვიძე</label><input type="time" id="sleep-end" value="07:30"></div>
+                </div>
+                <button class="secondary" onclick="calculateSleep()">შეფასება</button>
+                <div id="sleep-feedback" class="sleep-feedback"></div>
+            </div>
         </div>
 
         <!-- TAB 4: 1-on-1 DIRECT CHAT (პირადი ჩატი) -->
@@ -308,6 +325,12 @@
                 </div>
             </div>
 
+            <div class="card">
+                <h2>📸 ვიზუალური პროგრესი</h2>
+                <input type="file" accept="image/*" onchange="handlePhotoUpload(event)" style="background:transparent; border:none; padding:0; color:var(--primary);">
+                <div id="photo-gallery" class="photo-gallery"></div>
+            </div>
+
             <div class="support-box">
                 <div style="font-size:12px; font-weight:700; color:#fff;">🐞 ბაგი ან კითხვა გაქვს?</div>
                 <div style="font-size:11px; color:var(--text-muted); margin:4px 0;">მოგვწერე პირდაპირ ელ-ფოსტაზე:</div>
@@ -315,7 +338,31 @@
             </div>
         </div>
 
-        <!-- TAB 5: ექსკლუზიური ადმინ პორტალი (მხოლოდ nikkaburnadze@gmail.com-ისთვის) -->
+        <!-- TAB 5: ბიუჯეტი & საყიდლების სია -->
+        <div id="tab-budget" class="tab-content">
+            <div class="card">
+                <h2>💰 თვის ბიუჯეტი: <span id="display-budget-total">250</span> ₾</h2>
+                <div class="stat-grid">
+                    <div class="stat-box"><div class="stat-value" id="budget-spent" style="color:var(--danger)">0</div><div class="item-sub">დახარჯული (₾)</div></div>
+                    <div class="stat-box"><div class="stat-value" id="budget-rem" style="color:var(--primary)">250</div><div class="item-sub">დარჩენილი (₾)</div></div>
+                </div>
+                <div class="progress-bg"><div class="progress-fill" id="budget-progress" style="width: 0%; background: var(--danger);"></div></div>
+            </div>
+
+            <div class="card">
+                <h2>🛒 საყიდლების сია (ჯანსაღი)</h2>
+                <div id="shopping-list"></div>
+            </div>
+
+            <div class="card">
+                <h2>➕ სხვა ხარჯის ჩაწერა</h2>
+                <input type="text" id="expense-name" placeholder="რა ვიყიდე">
+                <input type="number" id="expense-amount" placeholder="ფასი ლარებში" step="0.1">
+                <button onclick="addExpense()">დამატება</button>
+            </div>
+        </div>
+
+        <!-- TAB 6: ექსკლუზიური ადმინ პორტალი (მხოლოდ nikkaburnadze@gmail.com-ისთვის) -->
         <div id="tab-admin" class="tab-content">
             <div class="card" style="border-color: rgba(16, 185, 129, 0.6); background: rgba(16, 185, 129, 0.05);">
                 <h2>👑 დამფუძნებლის პორტალი</h2>
@@ -340,12 +387,13 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation (6 Tabs) -->
     <div class="bottom-nav" id="app-nav" style="display:none;">
         <button class="nav-btn active" onclick="switchTab('diet', this)"><span class="nav-icon">🍏</span><span>კვება</span></button>
         <button class="nav-btn" onclick="switchTab('schedule', this)"><span class="nav-icon">⏱️</span><span>რეჟიმი</span></button>
         <button class="nav-btn" onclick="switchTab('activity', this)"><span class="nav-icon">🏃</span><span>აქტივობა</span></button>
         <button class="nav-btn" onclick="switchTab('coach', this)"><span class="nav-icon">💬</span><span>ჩატი</span></button>
+        <button class="nav-btn" onclick="switchTab('budget', this)"><span class="nav-icon">💰</span><span>ბიუჯეტი</span></button>
         <button class="nav-btn" id="admin-nav-btn" style="display:none;" onclick="switchTab('admin', this)"><span class="nav-icon">👑</span><span>პორტალი</span></button>
     </div>
 
@@ -373,9 +421,18 @@
         let currentUser = null;
         let selectedAdminUserUid = null;
         const today = new Date().toISOString().split('T')[0];
+        const currentMonth = today.slice(0, 7);
 
-        let userData = { foods: [], water: 0, steps: 0, fastingStart: null, streak: 1 };
+        let userData = { foods: [], water: 0, steps: 0, fastingStart: null, streak: 1, expenses: [], photos: [] };
         const UNHEALTHY = ['ტორტი', 'შაქარი', 'ჩიფსი', 'შოკოლადი', 'ხაჭაპური', 'ბურგერი', 'პიცა', 'ხინკალი', 'ალკოჰოლი'];
+        const SHOPPING_ITEMS = [
+            { name: "კვერცხი (30 ცალი)", price: 15 },
+            { name: "ქათმის ფილე/ბარძაყი (1 კგ)", price: 12 },
+            { name: "ხაჭო 5% (500 გრ)", price: 6 },
+            { name: "შვრია (1 კგ)", price: 4 },
+            { name: "წიწიბურა/ბრინჯი", price: 5 },
+            { name: "ბოსტნეული (კვირის)", price: 15 }
+        ];
 
         function showNotification(msg, isDanger = false) {
             const notif = document.getElementById('notification');
@@ -445,7 +502,7 @@
             db.collection('users').doc(currentUser.uid).collection('days').doc(today).set(userData);
         }
 
-        // ⚡ INSTANT DIRECT MESSAGING (REAL-TIME WEBSOCKET LISTENER)
+        // ⚡ INSTANT DIRECT MESSAGING
         function sendMessage() {
             let text = document.getElementById('chat-input').value.trim();
             if(!text || !currentUser) return;
@@ -600,6 +657,25 @@
             document.getElementById('step-val').innerText = userData.steps || 0;
             document.getElementById('step-progress').style.width = Math.min(100, ((userData.steps || 0) / 10000) * 100) + "%";
 
+            // Budget
+            let spentThisMonth = (userData.expenses || []).filter(e => e.date && e.date.startsWith(currentMonth)).reduce((acc, e) => acc + Number(e.amount), 0);
+            document.getElementById('budget-spent').innerText = spentThisMonth.toFixed(1);
+            document.getElementById('budget-rem').innerText = (250 - spentThisMonth).toFixed(1);
+            document.getElementById('budget-progress').style.width = Math.min(100, (spentThisMonth / 250) * 100) + "%";
+
+            let shopHtml = '';
+            SHOPPING_ITEMS.forEach(item => {
+                shopHtml += `<div class="list-item"><div class="item-details"><b>${item.name}</b><span class="item-sub">~${item.price} ₾</span></div><button class="secondary" style="width:auto; padding:6px 12px; font-size:12px;" onclick="quickBuy('${item.name}', ${item.price})">ვიყიდე</button></div>`;
+            });
+            document.getElementById('shopping-list').innerHTML = shopHtml;
+
+            // Photos
+            let phtml = '';
+            (userData.photos || []).forEach((p, i) => {
+                phtml += `<div class="photo-card"><img src="${p.src}"></div>`;
+            });
+            document.getElementById('photo-gallery').innerHTML = phtml || '<div class="item-sub">ფოტოები არ არის.</div>';
+
             updateFastingUI();
         }
 
@@ -627,6 +703,16 @@
         function addWater(ml) { userData.water = (userData.water || 0) + ml; saveCloudData(); showNotification(`💧 +${ml}მლ წყალი`); }
         function addSteps() { let s = parseInt(document.getElementById('steps-input').value)||0; userData.steps = (userData.steps || 0) + s; saveCloudData(); document.getElementById('steps-input').value=''; }
 
+        function addExpense() {
+            let n = document.getElementById('expense-name').value, a = document.getElementById('expense-amount').value;
+            if(!n || !a) return;
+            if(!userData.expenses) userData.expenses = [];
+            userData.expenses.push({ date: today, name: n, amount: parseFloat(a) });
+            document.getElementById('expense-name').value = ''; document.getElementById('expense-amount').value = '';
+            saveCloudData(); showNotification("💰 ხარჯი დაემატა");
+        }
+        function quickBuy(n, p) { if(!userData.expenses) userData.expenses = []; userData.expenses.push({ date: today, name: n, amount: parseFloat(p) }); saveCloudData(); showNotification("✅ ხარჯი დაემატა"); }
+
         let wTimer;
         function startWorkoutTimer() {
             let btn = document.getElementById('workout-btn'), disp = document.getElementById('workout-timer-display'), tDisp = document.getElementById('w-time');
@@ -639,6 +725,38 @@
                 let m = Math.floor(timeLeft/60).toString().padStart(2,'0'), s = (timeLeft%60).toString().padStart(2,'0');
                 tDisp.innerText = m+":"+s;
             }, 1000);
+        }
+
+        function calculateSleep() {
+            let start = document.getElementById('sleep-start').value, end = document.getElementById('sleep-end').value;
+            let [h1, m1] = start.split(':').map(Number), [h2, m2] = end.split(':').map(Number);
+            let startMin = h1 * 60 + m1, endMin = h2 * 60 + m2;
+            if (endMin < startMin) endMin += 24 * 60; 
+            let hrs = ((endMin - startMin) / 60).toFixed(1);
+            userData.sleepHrs = hrs; saveCloudData();
+
+            let fb = document.getElementById('sleep-feedback');
+            fb.className = hrs < 6.5 ? 'sleep-feedback bad' : 'sleep-feedback good';
+            fb.innerHTML = hrs < 6.5 ? `⚠️ <b>გეძინა ${hrs} საათი.</b> უძილობა აჩერებს ცხიმის წვას.` : `✅ <b>გეძინა ${hrs} საათი.</b> იდეალურია!`;
+        }
+
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas'); const MAX = 300; const scale = Math.min(MAX/img.width, MAX/img.height, 1);
+                    canvas.width = img.width * scale; canvas.height = img.height * scale;
+                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    if(!userData.photos) userData.photos=[];
+                    userData.photos.push({ date: today, src: canvas.toDataURL('image/jpeg', 0.5) });
+                    if(userData.photos.length > 3) userData.photos.shift();
+                    saveCloudData();
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
         }
 
         function timeMath(timeStr, addMins) { let [h, m] = timeStr.split(':').map(Number); let d = new Date(); d.setHours(h, m + addMins, 0); return d.toTimeString().slice(0, 5); }
